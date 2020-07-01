@@ -1,0 +1,16 @@
+name = "Terming"
+uuid = "5a1048b7-9ca6-4e8a-8e2e-1f932e78ac4e"
+authors = ["JingYu Ning <foldfelis@gmail.com> and contributors"]
+version = "0.1.0"
+
+[deps]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1.4"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
