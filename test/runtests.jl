@@ -24,6 +24,8 @@ function REPL.Terminals.raw!(t::FakeTerminal, raw::Bool)
     t.raw = raw
 end
 
+REPL.Terminals.displaysize(::FakeTerminal) = (24, 80)
+
 fake_key_press(key::String; t=T.term) = print(t.in_stream, key)
 
 @testset "Terming.jl" begin

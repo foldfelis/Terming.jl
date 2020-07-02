@@ -16,14 +16,14 @@ export # wrapping
     beep,
     enable_bracketed_paste,
     disable_bracketed_paste,
-    end_keypad_transmit_mode,
-    read_next_char
+    end_keypad_transmit_mode
 
 export # extensions
     cmove,
     clear_line
 
 export # utils
+    read_next_char,
     init_term,
     read_buffer
 
