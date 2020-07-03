@@ -1,19 +1,19 @@
+function read_out_buffer(; t=T.term)
+    c = string(T.read_next_char(t.out_stream))
+
+    stream_size = t.out_stream.buffer.size
+    if stream_size > 1
+        for i=1:stream_size-1
+            c *= T.read_next_char(t.out_stream)
+        end
+    end
+
+    return c
+end
+
 @testset "terminal.wrapping" begin
 
     @test T.displaysize() == (24, 80)
-
-    function read_out_buffer(; t=T.term)
-        c = string(T.read_next_char(t.out_stream))
-
-        stream_size = t.out_stream.buffer.size
-        if stream_size > 1
-            for i=1:stream_size-1
-                c *= T.read_next_char(t.out_stream)
-            end
-        end
-
-        return c
-    end
 
     T.cmove_up()
     @test read_out_buffer() == "$(T.CSI)1A"
@@ -65,13 +65,39 @@ end
 
 @testset "terminal.extension" begin
 
+    T.cmove(6, 5)
+    @test read_out_buffer() == "$(T.CSI)6;5H"
+
+    T.cmove_line_last()
+    @test read_out_buffer() == "$(T.CSI)24;1H"
+
+    T.cshow()
+    @test read_out_buffer() == "$(T.CSI)?25h"
+
+    T.cshow(false)
+    @test read_out_buffer() == "$(T.CSI)?25l"
+
+    T.csave()
+    @test read_out_buffer() == "$(T.CSI)s"
+
+    T.crestore()
+    @test read_out_buffer() == "$(T.CSI)u"
+
 end
 
 @testset "terminal.utils" begin
 
-    fake_key_press("k")
     T.raw!(true)
+
+    fake_key_press("k")
     @test T.read_buffer() == "k"
+
+    fake_key_press("\t")
+    @test T.read_buffer() == "\t"
+
+    fake_key_press("$(T.CSI)Z")
+    @test T.read_buffer() == "\e[Z"
+
     T.raw!(false)
 
 end

@@ -35,19 +35,19 @@ const CSI = REPL.Terminals.CSI
 
 displaysize(; t=term) = REPL.Terminals.displaysize(t)
 
-cmove_up(n; t=term) = REPL.Terminals.cmove_up(t, n)
+cmove_up(n::Int; t=term) = REPL.Terminals.cmove_up(t, n)
 cmove_up(; t=term) = REPL.Terminals.cmove_up(t)
-cmove_down(n; t=term) = REPL.Terminals.cmove_down(t, n)
+cmove_down(n::Int; t=term) = REPL.Terminals.cmove_down(t, n)
 cmove_down(; t=term) = REPL.Terminals.cmove_down(t)
-cmove_left(n; t=term) = REPL.Terminals.cmove_left(t, n)
+cmove_left(n::Int; t=term) = REPL.Terminals.cmove_left(t, n)
 cmove_left(; t=term) = REPL.Terminals.cmove_left(t)
-cmove_right(n; t=term) = REPL.Terminals.cmove_right(t, n)
+cmove_right(n::Int; t=term) = REPL.Terminals.cmove_right(t, n)
 cmove_right(; t=term) = REPL.Terminals.cmove_right(t)
-cmove_line_up(n; t=term) = REPL.Terminals.cmove_line_up(t, n)
+cmove_line_up(n::Int; t=term) = REPL.Terminals.cmove_line_up(t, n) # CSI n F
 cmove_line_up(; t=term) = REPL.Terminals.cmove_line_up(t)
-cmove_line_down(n; t=term) = REPL.Terminals.cmove_line_down(t, n)
+cmove_line_down(n::Int; t=term) = REPL.Terminals.cmove_line_down(t, n) # SCI n E
 cmove_line_down(; t=term) = REPL.Terminals.cmove_line_down(t)
-cmove_col(n; t=term) = REPL.Terminals.cmove_col(t, n)
+cmove_col(n::Int; t=term) = REPL.Terminals.cmove_col(t, n) # SCI n G
 
 clear(; t=term) = REPL.Terminals.clear(t)
 clear_line(t=term) =  REPL.Terminals.clear_line(t)
@@ -63,8 +63,15 @@ end_keypad_transmit_mode(; t=term) = REPL.Terminals.end_keypad_transmit_mode(t)
 # | extensions |
 # +------------+
 
-cmove(x, y; t=term) = error("Unimplemented")
-# clear_line(row; t=term) = error("Unimplemented")
+cmove(y::Int, x::Int; t=term) = write(t.out_stream, "$(CSI)$(y);$(x)H")
+cmove_line_last(; t=term) = write(t.out_stream, "$(CSI)$(displaysize()[1]);1H")
+
+clear_line(row::Int; t=term) = (write(t.out_stream, "$(CSI)$(row);1H"); clear_line())
+
+cshow(enable=true; t=term) = enable ? write(t.out_stream, "$(CSI)?25h") : write(t.out_stream, "$(CSI)?25l")
+
+csave(; t=term) = write(t.out_stream, "$(CSI)s")
+crestore(; t=term) = write(t.out_stream, "$(CSI)u")
 
 # +-------+
 # | utils |
