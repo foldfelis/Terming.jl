@@ -35,5 +35,6 @@ fake_key_press(key::String; t=T.term) = print(t.in_stream, key)
     ))
 
     include("terminal.jl")
+    include("parser.jl")
 
 end
