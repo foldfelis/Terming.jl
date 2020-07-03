@@ -63,6 +63,8 @@ end_keypad_transmit_mode(; t=term) = REPL.Terminals.end_keypad_transmit_mode(t)
 # | extensions |
 # +------------+
 
+displaysize(height::Int, width::Int; t=term) = write(t.out_stream, "$(CSI)8;$(height);$(width)t")
+
 cmove(y::Int, x::Int; t=term) = write(t.out_stream, "$(CSI)$(y);$(x)H")
 cmove_line_last(; t=term) = write(t.out_stream, "$(CSI)$(displaysize()[1]);1H")
 
