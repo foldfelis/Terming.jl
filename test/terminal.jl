@@ -65,6 +65,9 @@ end
 
 @testset "terminal.extension" begin
 
+    T.displaysize(30, 50)
+    @test read_out_buffer() == "$(T.CSI)8;$(30);$(50)t"
+
     T.cmove(6, 5)
     @test read_out_buffer() == "$(T.CSI)6;5H"
 
