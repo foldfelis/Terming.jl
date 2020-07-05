@@ -63,6 +63,8 @@ end_keypad_transmit_mode(; t=term) = REPL.Terminals.end_keypad_transmit_mode(t)
 # | extensions |
 # +------------+
 
+displaysize(height::Int, width::Int; t=term) = write(t.out_stream, "$(CSI)8;$(height);$(width)t")
+
 cmove(y::Int, x::Int; t=term) = write(t.out_stream, "$(CSI)$(y);$(x)H")
 cmove_line_last(; t=term) = write(t.out_stream, "$(CSI)$(displaysize()[1]);1H")
 
@@ -84,17 +86,23 @@ function init_term(; in_stream=stdin, out_stream=stdout, err_stream=stderr)
     )
 end
 
-read_next_char(io::IO) = Char(read(io, 1)[1])
+read_next_byte(io::IO) = read(io, 1)[1]
 
-function read_buffer(; t=term)
-    c = string(read_next_char(t.in_stream))
+function read_buffer_bytes(; stream=term.in_stream)
+    queue = UInt8[]
 
-    stream_size = t.in_stream.buffer.size
+    push!(queue, read_next_byte(stream))
+
+    stream_size = stream.buffer.size
     if stream_size > 1
         for i=1:stream_size-1
-            c *= read_next_char(t.in_stream)
+            push!(queue, read_next_byte(stream))
         end
     end
 
-    return c
+    return queue
 end
+
+read_next_char(io::IO) = Char(read_next_byte(io))
+
+read_buffer(; stream=term.in_stream) = String(read_buffer_bytes(stream=stream))
