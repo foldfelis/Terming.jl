@@ -91,18 +91,3 @@ end
     T.raw!(false)
 
 end
-
-# @testset "terminal.manual" begin
-
-#     T.set_term!(T.init_term())
-
-#     c = ""
-#     while c != "\033"
-#         T.raw!(true)
-#         c = T.read_buffer()
-#         T.raw!(false)
-
-#         @show c
-#     end
-
-# end
