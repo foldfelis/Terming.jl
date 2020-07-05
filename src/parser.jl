@@ -10,7 +10,19 @@ function parse_queue(queue::String)
         c = popfirst!(queue)
 
         if c == '\e'
-            push!(events, "This is an escape character, leading a control sequence.")
+            c = popfirst!(queue)
+            if c == '0' # F1 - F4
+                c = popfirst!(queue)
+                if c in [Char(i) for i=Int('P'):Int('S')]
+                    push!(events, "'F$(1+Int(c)-Int('P'))' pressed")
+                else
+                    throw(err)
+                end
+            elseif c == '['
+                push!(events, "Some CSI sequence")
+            else
+                push!(events, "'ALT+$(c)' pressed")
+            end
         elseif c == '\n' || c == '\r'
             push!(events, "'Enter' pressed")
         elseif c == '\t'
@@ -28,5 +40,4 @@ function parse_queue(queue::String)
     end
 
     return events
-
 end

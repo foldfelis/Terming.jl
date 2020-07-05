@@ -6,6 +6,6 @@
     fake_input("😁")
     @show T.parse_queue(T.read_buffer())
 
-    fake_input("\e\n\r\t\x7F\0😁Good")
+    fake_input("\e0P\eA\n\r\t\x7F\0😁Good")
     @show T.parse_queue(T.read_buffer())
 end
