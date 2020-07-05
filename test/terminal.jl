@@ -79,13 +79,13 @@ end
 
     T.raw!(true)
 
-    fake_key_press("k")
+    fake_input("k")
     @test T.read_buffer() == "k"
 
-    fake_key_press("\t")
+    fake_input("\t")
     @test T.read_buffer() == "\t"
 
-    fake_key_press("$(T.CSI)Z")
+    fake_input("$(T.CSI)Z")
     @test T.read_buffer() == "\e[Z"
 
     T.raw!(false)

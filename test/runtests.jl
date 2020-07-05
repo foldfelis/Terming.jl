@@ -4,7 +4,7 @@ using Test
 using Terming
 const T = Terming
 
-export FakeTerminal, fake_key_press
+export FakeTerminal, fake_input
 
 mutable struct FakeTerminal <: REPL.Terminals.UnixTerminal
     term_type::String
@@ -26,7 +26,7 @@ end
 
 REPL.Terminals.displaysize(::FakeTerminal) = (24, 80)
 
-fake_key_press(key::String; t=T.term) = print(t.in_stream, key)
+fake_input(key::String; t=T.term) = print(t.in_stream, key)
 
 @testset "Terming.jl" begin
 
@@ -35,6 +35,5 @@ fake_key_press(key::String; t=T.term) = print(t.in_stream, key)
     ))
 
     include("terminal.jl")
-    include("parser.jl")
 
 end

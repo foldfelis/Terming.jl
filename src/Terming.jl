@@ -1,7 +1,6 @@
 module Terming
 
     include("terminal.jl")
-    include("parser.jl")
 
     export set_term!
 
