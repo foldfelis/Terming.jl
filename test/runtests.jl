@@ -28,36 +28,36 @@ REPL.Terminals.displaysize(::FakeTerminal) = (24, 80)
 
 fake_input(key::String; t=T.term) = print(t.in_stream, key)
 
-@testset "manual" begin
+# @testset "manual" begin
 
-    quit_key = "\033"
+#     quit_key = "\033"
 
-    queue = Channel{String}(64)
-    Base.Threads.@spawn begin
-        while true
-            key = T.read_buffer()
-            put!(queue, key)
-            (key == quit_key) && break
-        end
-    end
+#     queue = Channel{String}(64)
+#     Base.Threads.@spawn begin
+#         while true
+#             key = T.read_buffer()
+#             put!(queue, key)
+#             (key == quit_key) && break
+#         end
+#     end
 
-    T.raw!(true)
-    is_running = true
-    while is_running
-        c = ""
-        c = take!(queue)
-        @show c
+#     T.raw!(true)
+#     is_running = true
+#     while is_running
+#         c = ""
+#         c = take!(queue)
+#         @show c
 
-        # sleep(1) # previous time-consuming calculation
-        if c == quit_key
-            is_running = false
-            println(T.term.out_stream, "Shutted down... ")
-        end
-        # sleep(1) # next time-consuming calculation
-    end
-    T.raw!(false)
+#         # sleep(1) # previous time-consuming calculation
+#         if c == quit_key
+#             is_running = false
+#             println(T.term.out_stream, "Shutted down... ")
+#         end
+#         # sleep(1) # next time-consuming calculation
+#     end
+#     T.raw!(false)
 
-end
+# end
 
 @testset "Terming.jl" begin
 
@@ -66,5 +66,6 @@ end
     ))
 
     include("terminal.jl")
+    include("parser.jl")
 
 end
