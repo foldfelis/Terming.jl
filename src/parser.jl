@@ -67,8 +67,8 @@ function parse_csi(sequence::String, state::Int)
     next = iterate(sequence, state)
     if next === nothing # Direction keys
         return parse_direction_code(sequence, c)
-    elseif sequence[end] == '~' # F5 - F12 with(out) ctl key
-        if ';' in sequence
+    elseif sequence[end] == '~'
+        if ';' in sequence  # F5 - F12 and spetial keys with ctl key
             splitted_sci = split(sequence[(state-1):end-1], ';')
             key_code = parse(Int, string(splitted_sci[1]))
             ctl_code = splitted_sci[2][1]
@@ -96,7 +96,7 @@ function parse_csi(sequence::String, state::Int)
             ctl = parse_ctl_code(ctl_code)
 
             return "$(ctl)+$(key)"
-        else
+        else # F5 - F12 and spetial keys
             key_code = parse(Int, sequence[(state-1):end-1])
             if key_code == 1 || key_code == 7
                 return "Home"
@@ -121,7 +121,6 @@ function parse_csi(sequence::String, state::Int)
     elseif ';' in sequence
         splitted_sci = split(sequence[(state-1):end], ';')
         if splitted_sci[1] == "1"
-            @show "yes"
             ctl_code = splitted_sci[2][1]
             ctl = parse_ctl_code(ctl_code)
             f_code = splitted_sci[2][2]
