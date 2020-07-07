@@ -47,6 +47,7 @@ fake_input(key::String; t=T.term) = print(t.in_stream, key)
 #         c = ""
 #         c = take!(queue)
 #         @show c
+#         @show T.parse_sequence(c)
 
 #         # sleep(1) # previous time-consuming calculation
 #         if c == quit_key
