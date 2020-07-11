@@ -67,6 +67,7 @@ fake_input(key::String; t=T.term) = print(t.in_stream, key)
     ))
 
     include("terminal.jl")
+    include("event.jl")
     include("parser.jl")
 
 end
