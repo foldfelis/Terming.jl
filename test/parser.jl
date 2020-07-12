@@ -63,9 +63,23 @@
             @test T.match(T.parse_sequence("\eOR"), T.KeyPressedEvent(T.F3, T.CtlKeys[]))
             @test T.match(T.parse_sequence("\eOS"), T.KeyPressedEvent(T.F4, T.CtlKeys[]))
 
+            @testset "F1 - F4 fallback" begin
+
+                str = "\eOz"
+                @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+
+            end
+
         end
 
         @testset "parse_csi" begin
+
+            @testset "parse_csi fallback" begin
+
+                str = "\e["
+                @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+
+            end
 
             function create_ctls(ctls_code::Int)
                 if ctls_code == 2
@@ -88,6 +102,26 @@
             end
 
             @testset "vt sequence" begin
+
+                @testset "vt sequence fallback" begin
+
+                    str = "\e[;~"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[a;~"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[;b~"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[a;b~"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[1;9~"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+
+                    str = "\e[~"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[a~"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+
+                end
 
                 function test_vt(; ctls_code=-1, ctls=T.CtlKeys[])
                     if ctls_code != -1
@@ -157,6 +191,28 @@
 
             @testset "xterm sequence" begin
 
+                @testset "vt sequence fallback" begin
+
+                    str = "\e[;"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[a;8A"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[1;8AA"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[1;aa"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[1;9A"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+
+                    str = "\e["
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[99"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+                    str = "\e[a"
+                    @test T.match(T.parse_sequence(str), T.PasteEvent(str))
+
+                end
+
                 function test_xterm(; ctls_code=-1, ctls=T.CtlKeys[])
                     if ctls_code != -1
                         ctls_str = "1;$(ctls_code)"
@@ -221,6 +277,13 @@
         @testset "ALT + Char" begin
 
             @test T.match(T.parse_sequence("\eA"), T.KeyPressedEvent('A', [T.ALT]))
+
+        end
+
+        @testset "parse_esc_leaded_sequence fallback" begin
+
+            str = "\efallback"
+            @test T.match(T.parse_sequence(str), T.PasteEvent(str))
 
         end
 

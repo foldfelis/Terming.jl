@@ -67,9 +67,9 @@ function parse_csi(sequence::String, state::Int)
     if sequence[end] == '~' # vt sequence
         code_sequence = sequence[state:(end-1)]
         if ';' in code_sequence # with ctl keys
-            # +-----------------------------------------------------------------+
+            # +------------------------------------------------------------------+
             # | the form of the sequence: "\e[<code>;<ctls_code>~" and code=1:35 |
-            # +-----------------------------------------------------------------+
+            # +------------------------------------------------------------------+
             code, ctls_code = tryparse.(Int, split(code_sequence, ';'))
             (code === nothing || ctls_code === nothing) && (return PasteEvent(sequence))  # fallback
             ctls = parse_ctl_code(ctls_code)
@@ -121,8 +121,6 @@ function parse_csi(sequence::String, state::Int)
 
         return parse_xterm_code(sequence, code, ctls=ctls)
     end
-
-    return PasteEvent(sequence) # fallback
 end
 
 function parse_vt_code(sequence::String, code::Int; ctls=CtlKeys[])
