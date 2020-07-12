@@ -52,6 +52,8 @@ struct KeyPressedEvent <: Event
     ctls::Vector{CtlKeys}
 end
 
+KeyPressedEvent(key::Union{Char, SpetialKeys}) = KeyPressedEvent(key, CtlKeys[])
+
 function Base.show(io::IO, e::KeyPressedEvent)
     print(io, "KeyPressedEvent(")
     join(io, string.(e.ctls), "+")

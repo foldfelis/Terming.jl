@@ -4,6 +4,10 @@
     @test event.key === 'c'
     @test T.CTRL in event.ctls
 
+    event = T.KeyPressedEvent(T.ESC)
+    @test event.key === T.ESC
+    @test event.ctls == T.CtlKeys[]
+
     event = T.PasteEvent("Apple is good to eat")
     @test event.content === "Apple is good to eat"
 
