@@ -1,5 +1,6 @@
 export SpetialKeys, CtlKeys
 export Event, KeyPressedEvent, PasteEvent
+export match
 
 @enum SpetialKeys begin
     # Function Keys match range 0:11
@@ -51,6 +52,26 @@ struct KeyPressedEvent <: Event
     ctls::Vector{CtlKeys}
 end
 
+function Base.show(io::IO, e::KeyPressedEvent)
+    print(io, "KeyPressedEvent(")
+    join(io, string.(e.ctls), "+")
+    (length(e.ctls) > 0) && (print(io, "+"))
+    print(io, "'$(string(e.key))')")
+end
+
 struct PasteEvent <: Event
     content::String
 end
+
+Base.show(io::IO, e::PasteEvent) = print(io, "PasteEvent(\"$(e.content)\")")
+
+function match(e1::KeyPressedEvent, e2::KeyPressedEvent)
+    (e1.key === e2.key) || return false
+    for ctl in e1.ctls
+        (ctl in e2.ctls) || return false
+    end
+
+    return true
+end
+
+match(e1::PasteEvent, e2::PasteEvent) = (e1.content === e2.content)
