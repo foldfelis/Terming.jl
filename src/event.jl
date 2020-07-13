@@ -1,5 +1,5 @@
 export SpetialKeys, CtlKeys
-export Event, KeyPressedEvent, PasteEvent
+export Event, QuitEvent, KeyPressedEvent, PasteEvent
 export match
 
 @enum SpetialKeys begin
@@ -46,6 +46,10 @@ end
 end
 
 abstract type Event end
+
+struct QuitEvent <: Event end
+
+match(e1::QuitEvent, e2::QuitEvent) = (e1 === e2)
 
 struct KeyPressedEvent <: Event
     key::Union{Char, SpetialKeys}
