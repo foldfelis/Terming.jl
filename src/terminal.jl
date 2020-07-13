@@ -26,7 +26,7 @@ export # utils
     read_next_char,
     init_term,
     read_buffer,
-    init_asynced_input_queue
+    init_event_queue
 
 # +---------------------------+
 # | wrpping of REPL.Terminals |
@@ -108,15 +108,35 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 
 read_buffer(; stream=term.in_stream) = String(read_buffer_bytes(stream=stream))
 
-function init_asynced_input_queue(quit_sequence::String; size=Inf)
+function init_asynced_input_queue(quit_sequence::String, size)
     queue = Channel{String}(size)
     Base.Threads.@spawn begin
         while true
             sequence = read_buffer()
             put!(queue, sequence)
-            (sequence == quit_sequence) && break
+            (sequence == quit_sequence) && (put!(queue, "\e\e\eStopParsing"); break)
         end
     end
 
     return queue
+end
+
+function init_asynced_event_queue(sequence_queue::Channel{String}, size)
+    event_queue = Channel{Event}(size)
+    Base.Threads.@spawn begin
+        while true
+            sequence = take!(sequence_queue)
+            (sequence == "\e\e\eStopParsing") && (put!(event_queue, QuitEvent()); break)
+            put!(event_queue, parse_sequence(sequence))
+        end
+    end
+
+    return event_queue
+end
+
+function init_event_queue(quit_sequence::String; size=Inf)
+    sequence_queue = init_asynced_input_queue(quit_sequence, size)
+    event_queue = init_asynced_event_queue(sequence_queue, size)
+
+    return event_queue
 end
