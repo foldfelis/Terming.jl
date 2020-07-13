@@ -25,7 +25,8 @@ export # extensions
 export # utils
     read_next_char,
     init_term,
-    read_buffer
+    read_buffer,
+    init_asynced_input_queue
 
 # +---------------------------+
 # | wrpping of REPL.Terminals |
@@ -106,3 +107,16 @@ end
 read_next_char(io::IO) = Char(read_next_byte(io))
 
 read_buffer(; stream=term.in_stream) = String(read_buffer_bytes(stream=stream))
+
+function init_asynced_input_queue(quit_sequence::String; size=Inf)
+    queue = Channel{String}(size)
+    Base.Threads.@spawn begin
+        while true
+            sequence = read_buffer()
+            put!(queue, sequence)
+            (sequence == quit_sequence) && break
+        end
+    end
+
+    return queue
+end
