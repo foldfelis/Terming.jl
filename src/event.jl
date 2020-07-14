@@ -39,30 +39,33 @@ export match
     NULL
 end
 
-@enum CtlKeys begin
+@enum CtlKey begin
     SHIFT = 2
     CTRL = 3
+    SHIFT_ALT = 4
     ALT = 5
+    SHIFT_CTRL = 6
+    CTRL_ALT = 7
+    SHIFT_CTRL_ALT = 8
+    NO_CTL = -1
 end
 
 abstract type Event end
 
 struct QuitEvent <: Event end
 
-match(e1::QuitEvent, e2::QuitEvent) = (e1 === e2)
+Base.show(io::IO, ::QuitEvent) = print(io, "QuitEvent")
 
 struct KeyPressedEvent <: Event
     key::Union{Char, SpetialKeys}
-    ctls::Vector{CtlKeys}
+    ctl::CtlKey
 end
 
-KeyPressedEvent(key::Union{Char, SpetialKeys}) = KeyPressedEvent(key, CtlKeys[])
+KeyPressedEvent(key::Union{Char, SpetialKeys}) = KeyPressedEvent(key, NO_CTL)
 
 function Base.show(io::IO, e::KeyPressedEvent)
-    print(io, "KeyPressedEvent(")
-    join(io, string.(e.ctls), "+")
-    (length(e.ctls) > 0) && (print(io, "+"))
-    print(io, "'$(string(e.key))')")
+    ctl = (e.ctl === NO_CTL) ? "" : "$(string.(e.ctl))+"
+    print(io, "KeyPressedEvent($(ctl)'$(string(e.key))')")
 end
 
 struct PasteEvent <: Event
@@ -70,14 +73,3 @@ struct PasteEvent <: Event
 end
 
 Base.show(io::IO, e::PasteEvent) = print(io, "PasteEvent(\"$(e.content)\")")
-
-function match(e1::KeyPressedEvent, e2::KeyPressedEvent)
-    (e1.key === e2.key) || return false
-    for ctl in e1.ctls
-        (ctl in e2.ctls) || return false
-    end
-
-    return true
-end
-
-match(e1::PasteEvent, e2::PasteEvent) = (e1.content === e2.content)
