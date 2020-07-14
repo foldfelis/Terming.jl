@@ -1,10 +1,13 @@
+include("listener.jl")
+
 struct App
     size::Tuple{Int, Int}
-    quit_sequence::String
-    event_queue::Channel
+    listener::InputListener
     model::Model
     view::View
 end
+
+event_queue(app::App) = app.listener.pipeline[end]
 
 function init_term(app::App)
     run(`clear`)
@@ -17,54 +20,21 @@ end
 function reset_term(::App)
     T.raw!(false)
     T.cshow()
+
     return
 end
 
-@enum ChannelSignals begin
-    CLOSE
-end
+emit_quit_event(app::App) = put!(event_queue(app), T.QuitEvent())
 
-function init_event_queue(; quit_sequence="\e", size=Inf)
-    sequence_queue = Channel{Union{String, ChannelSignals}}(size)
-    Base.Threads.@spawn begin
-        while true
-            sequence = T.read_buffer()
-            put!(sequence_queue, sequence)
-
-            if sequence === quit_sequence
-                put!(sequence_queue, CLOSE)
-                break
-            end
-        end
-    end
-
-    event_queue = Channel{Union{T.Event, ChannelSignals}}(size)
-    Base.Threads.@spawn begin
-        while true
-            sequence = take!(sequence_queue)
-
-            if sequence === CLOSE
-                put!(event_queue, T.QuitEvent())
-                close(sequence_queue)
-                break
-            end
-
-            put!(event_queue, T.parse_sequence(sequence))
-        end
-    end
-
-    return sequence_queue, event_queue
-end
-
-function emit_quit_event(app::App)
+function handle_lose(app::App)
     T.cmove_line_last()
     println(T.term.out_stream, "\nYou Lose")
-    put!(app.event_queue, T.QuitEvent())
+    emit_quit_event(app)
 end
 
 function handle_quit(app::App)
     keep_running = false
-    close(app.event_queue)
+    foreach(close, app.listener.pipeline)
 
     T.cmove_line_last()
     println(T.term.out_stream, "\nShutted down...")
@@ -74,14 +44,15 @@ end
 
 function handle_event(app::App)
     snake = app.model
+    auto_move(snake)
 
     is_running = true
     while is_running
-        e = take!(app.event_queue)
+        e = take!(event_queue(app))
         if e === T.QuitEvent()
             is_running = handle_quit(app)
         elseif e === LossEvent()
-            emit_quit_event(app)
+            handle_lose(app)
         elseif e === UpdateEvent()
             paint(app.view)
         elseif e === T.KeyPressedEvent(T.UP)
@@ -92,6 +63,8 @@ function handle_event(app::App)
             move(snake, :right)
         elseif e === T.KeyPressedEvent(T.LEFT)
             move(snake, :left)
+        elseif e === T.KeyPressedEvent(T.ESC)
+            emit_quit_event(app)
         end
     end
 end

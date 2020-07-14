@@ -7,7 +7,8 @@ include("control.jl")
 
 function init_app(term_size=(30, 80))
     # event queue
-    _, event_queue = init_event_queue()
+    listener = InputListener()
+    event_queue = listener.pipeline[end]
 
     # model
     ph, pw = term_size
@@ -17,7 +18,7 @@ function init_app(term_size=(30, 80))
     snake_view = SnakeView(snake_model)
     form_view = FormView(term_size, [snake_view])
 
-    app = App(term_size, "\e", event_queue, snake_model, form_view)
+    app = App(term_size, listener, snake_model, form_view)
 
     return app
 end
