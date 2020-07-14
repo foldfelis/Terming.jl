@@ -44,12 +44,12 @@ function init_event_queue(; quit_sequence="\e", size=Inf)
             sequence = take!(sequence_queue)
 
             if sequence === CLOSE
-                put!(event_queue, QuitEvent())
+                put!(event_queue, T.QuitEvent())
                 close(sequence_queue)
                 break
             end
 
-            put!(event_queue, parse_sequence(sequence))
+            put!(event_queue, T.parse_sequence(sequence))
         end
     end
 
@@ -59,7 +59,7 @@ end
 function emit_quit_event(app::App)
     T.cmove_line_last()
     println(T.term.out_stream, "\nYou Lose")
-    put!(app.event_queue, QuitEvent())
+    put!(app.event_queue, T.QuitEvent())
 end
 
 function handle_quit(app::App)
