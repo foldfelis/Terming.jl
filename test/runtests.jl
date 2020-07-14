@@ -28,36 +28,87 @@ REPL.Terminals.displaysize(::FakeTerminal) = (24, 80)
 
 fake_input(key::String; t=T.term) = print(t.in_stream, key)
 
-@testset "manual" begin
+# @testset "manual" begin
 
-    quit_key = "\033"
+#     struct App
+#         event_queue::Channel
+#     end
 
-    queue = Channel{String}(64)
-    Base.Threads.@spawn begin
-        while true
-            key = T.read_buffer()
-            put!(queue, key)
-            (key == quit_key) && break
-        end
-    end
+#     @enum ChannelSignals begin
+#         CLOSE
+#     end
 
-    T.raw!(true)
-    is_running = true
-    while is_running
-        c = ""
-        c = take!(queue)
-        @show c
+#     function init_event_queue(;quit_sequence="\e", size=Inf)
+#         sequence_queue = Channel{Union{String, ChannelSignals}}(size)
+#         Base.Threads.@spawn begin
+#             while true
+#                 sequence = T.read_buffer()
+#                 put!(sequence_queue, sequence)
 
-        # sleep(1) # previous time-consuming calculation
-        if c == quit_key
-            is_running = false
-            println(T.term.out_stream, "Shutted down... ")
-        end
-        # sleep(1) # next time-consuming calculation
-    end
-    T.raw!(false)
+#                 if sequence === quit_sequence
+#                     put!(sequence_queue, CLOSE)
+#                     break
+#                 end
+#             end
+#         end
 
-end
+#         event_queue = Channel{Union{T.Event, ChannelSignals}}(size)
+#         Base.Threads.@spawn begin
+#             while true
+#                 sequence = take!(sequence_queue)
+
+#                 if sequence === CLOSE
+#                     put!(event_queue, QuitEvent())
+#                     close(sequence_queue)
+#                     break
+#                 end
+
+#                 put!(event_queue, parse_sequence(sequence))
+#             end
+#         end
+
+#         return sequence_queue, event_queue
+#     end
+
+#     function initial_app()
+#         _, event_queue = init_event_queue()
+#         app = App(event_queue)
+
+#         return app
+#     end
+
+#     function handle_quit(app::App)
+#         keep_running = false
+#         close(app.event_queue)
+#         println(T.term.out_stream, "Shutted down...")
+
+#         return keep_running
+#     end
+
+#     function handle_event(app::App)
+#         T.raw!(true)
+#         is_running = true
+#         while is_running
+#             e = take!(app.event_queue)
+#             @show e
+
+#             # sleep(1) # previous time-consuming calculation
+#             if e === T.QuitEvent()
+#                 is_running = handle_quit(app)
+#             end
+#             # sleep(1) # next time-consuming calculation
+#         end
+#         T.raw!(false)
+#     end
+
+#     function debug_manually()
+#         app = initial_app()
+#         handle_event(app)
+#     end
+
+#     debug_manually()
+
+# end
 
 @testset "Terming.jl" begin
 
@@ -66,5 +117,7 @@ end
     ))
 
     include("terminal.jl")
+    include("event.jl")
+    include("parser.jl")
 
 end

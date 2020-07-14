@@ -1,6 +1,8 @@
 module Terming
 
     include("terminal.jl")
+    include("event.jl")
+    include("parser.jl")
 
     export set_term!
 
