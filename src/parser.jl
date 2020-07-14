@@ -24,9 +24,9 @@ function parse_single_char_sequence(sequence::Char)
         return KeyPressedEvent(BACKSPACE, CtlKeys[])
     elseif sequence == '\0' # NULL
         return KeyPressedEvent(NULL, CtlKeys[])
-    elseif sequence in [Char(c) for c in 0x01:0x1A] # CTRL + key
+    elseif any(isequal(sequence), Char(0x01):Char(0x1A)) # CTRL + key
         return KeyPressedEvent(Char(UInt8(sequence)-0x01+UInt8('a')), [CTRL])
-    elseif sequence in [Char(c) for c in 0x1C:0x1F] # CTRL + key
+    elseif any(isequal(sequence), Char(0x0C):Char(0x1F)) # CTRL + key
         return KeyPressedEvent(Char(UInt8(sequence)-0x1C+UInt8('4')), [CTRL])
     else # single char
         return KeyPressedEvent(sequence, CtlKeys[])
@@ -53,7 +53,7 @@ function parse_xterm_f1_2_f4(sequence::String, state::Int)
     (next === nothing) && (return PasteEvent(sequence)) # fallback
 
     (c, state) = next
-    if c in [Char(i) for i=UInt8('P'):UInt8('S')]
+    if any(isequal(c), 'P':'S')
         return KeyPressedEvent(SpetialKeys(UInt8(c)-UInt8('P')), CtlKeys[])
     end
 
@@ -95,7 +95,7 @@ function parse_csi(sequence::String, state::Int)
 
             # determing key code
             c = code_sequence[2]
-            if c in [Char(i) for i=UInt8('P'):UInt8('S')] # F1 - F4 with ctl keys have the same form
+            if any(isequal(c), 'P':'S') # F1 - F4 with ctl keys have the same form
                 code = Int(c)-Int('P') # code=1:3, matches the enum F1 - F4
             else
                 code = Int(c)
