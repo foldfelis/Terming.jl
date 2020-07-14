@@ -31,55 +31,40 @@ fake_input(key::String; t=T.term) = print(t.in_stream, key)
 # @testset "manual" begin
 
 #     struct App
-#         event_queue::Channel
+#         pipeline::Vector{Channel}
 #     end
 
-#     @enum ChannelSignals begin
-#         CLOSE
-#     end
+#     get_event_queue(app::App) = app.pipeline[end]
 
-#     function init_event_queue(;quit_sequence="\e", size=Inf)
-#         sequence_queue = Channel{Union{String, ChannelSignals}}(size)
-#         Base.Threads.@spawn begin
+#     function init_pipeline(size=Inf)
+#         sequence_queue = Channel{String}(size, spawn=true) do ch
 #             while true
 #                 sequence = T.read_buffer()
-#                 put!(sequence_queue, sequence)
-
-#                 if sequence === quit_sequence
-#                     put!(sequence_queue, CLOSE)
-#                     break
-#                 end
+#                 put!(ch, sequence)
 #             end
 #         end
-
-#         event_queue = Channel{Union{T.Event, ChannelSignals}}(size)
-#         Base.Threads.@spawn begin
+#         event_queue = Channel{T.Event}(size, spawn=true) do ch
 #             while true
 #                 sequence = take!(sequence_queue)
-
-#                 if sequence === CLOSE
-#                     put!(event_queue, QuitEvent())
-#                     close(sequence_queue)
-#                     break
-#                 end
-
-#                 put!(event_queue, parse_sequence(sequence))
+#                 put!(ch, T.parse_sequence(sequence))
 #             end
 #         end
 
-#         return sequence_queue, event_queue
+#         return [sequence_queue, event_queue]
 #     end
 
 #     function initial_app()
-#         _, event_queue = init_event_queue()
-#         app = App(event_queue)
+#         pipeline = init_pipeline()
+#         app = App(pipeline)
 
 #         return app
 #     end
 
+#     emit_quit_event(app::App) = put!(get_event_queue(app), T.QuitEvent())
+
 #     function handle_quit(app::App)
 #         keep_running = false
-#         close(app.event_queue)
+#         foreach(close, app.pipeline)
 #         println(T.term.out_stream, "Shutted down...")
 
 #         return keep_running
@@ -89,12 +74,14 @@ fake_input(key::String; t=T.term) = print(t.in_stream, key)
 #         T.raw!(true)
 #         is_running = true
 #         while is_running
-#             e = take!(app.event_queue)
+#             e = take!(get_event_queue(app))
 #             @show e
 
 #             # sleep(1) # previous time-consuming calculation
 #             if e === T.QuitEvent()
 #                 is_running = handle_quit(app)
+#             elseif e === T.KeyPressedEvent(T.ESC)
+#                 emit_quit_event(app)
 #             end
 #             # sleep(1) # next time-consuming calculation
 #         end
