@@ -5,63 +5,52 @@ const HEAD_C = string(Crayon(foreground = :light_yellow))
 const NODE_C = string(Crayon(foreground = :light_green))
 const RES_C = string(Crayon(reset = true))
 
-abstract type Component end
+abstract type View end
 
-struct Form
-    components::Vector{Component}
+struct FormView <: View
+    size::Tuple{Int, Int}
+    components::Vector{View}
 end
 
-function paint(form::Form)
+function paint(form_view::FormView)
     stream = T.term.out_stream
+    h, w = form_view.size
 
     print(stream, FORM_C)
 
     T.cmove(1, 1)
     print(stream, Char(0x250C)) # ┌
-    print(stream, Char(0x2500)^(W-2))
+    print(stream, Char(0x2500)^(w-2))
     print(stream, Char(0x2510)) # ┐
+    T.cmove_line_down()
 
-    for i=2:(H-1)
+    for i=2:(h-1)
         print(stream, Char(0x2502))
-        print(stream, ' '^(W-2))
+        print(stream, ' '^(w-2))
         print(stream, Char(0x2502))
+        T.cmove_line_down()
     end
 
     print(stream, Char(0x2514)) # └
-    print(stream, Char(0x2500)^(W-2))
+    print(stream, Char(0x2500)^(w-2))
     print(stream, Char(0x2518)) # ┘
 
-    for component in form.components
+    for component in form_view.components
         paint(component)
     end
 
     print(stream, RES_C)
 end
 
-# node be like:
-# ┌┐
-# └┘
-const S_H, S_W = SNAKE_NODE_SIZE = (2, 2)
-
-mutable struct Snake <: Component
-    direction::Symbol
-    node_anchors::Vector{Tuple{Int, Int}}
+struct SnakeView <: View
+    snake::SnakeModel
 end
 
-function Snake(init_pos=(4, 50))
-    anchors = [init_pos]
-    for i=1:3
-        push!(anchors, (init_pos[1], init_pos[2]-S_W*i))
-    end
-
-    return Snake(:right, anchors)
-end
-
-function paint(snake::Snake)
+function paint(snake_view::SnakeView)
     stream = T.term.out_stream
 
     print(stream, HEAD_C)
-    for (i, node_pos) in enumerate(snake.node_anchors)
+    for (i, node_pos) in enumerate(snake_view.snake.node_anchors)
         y, x = node_pos
         T.cmove(y, x)
         T.csave()
@@ -72,8 +61,4 @@ function paint(snake::Snake)
 
         (i == 1) && (print(stream, NODE_C))
     end
-end
-
-struct View
-    form::Form
 end
