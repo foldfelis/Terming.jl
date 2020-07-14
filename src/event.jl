@@ -1,4 +1,4 @@
-export SpetialKeys, CtlKeys
+export SpetialKeys, CtlKey
 export Event, QuitEvent, KeyPressedEvent, PasteEvent
 export match
 
