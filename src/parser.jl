@@ -13,23 +13,31 @@ function parse_sequence(sequence::String)
     return PasteEvent(sequence) # fallback
 end
 
-function parse_single_char_sequence(sequence::Char)
+function parse_single_char_sequence(sequence::Char; is_alt=false)
+    if is_alt
+        ctl = ALT
+        ctrl_ctl = CTRL_ALT
+    else
+        ctl = NO_CTL
+        ctrl_ctl = CTRL
+    end
+
     if sequence == '\n' || sequence == '\r' # ENTER
-        return KeyPressedEvent(ENTER, CtlKeys[])
+        return KeyPressedEvent(ENTER, ctl)
     elseif sequence == '\e' # ESC
-        return KeyPressedEvent(ESC, CtlKeys[])
+        return KeyPressedEvent(ESC, ctl)
     elseif sequence == '\t' # TAB
-        return KeyPressedEvent(TAB, CtlKeys[])
+        return KeyPressedEvent(TAB, ctl)
     elseif sequence == '\x7F' #BACKSPACE
-        return KeyPressedEvent(BACKSPACE, CtlKeys[])
+        return KeyPressedEvent(BACKSPACE, ctl)
     elseif sequence == '\0' # NULL
-        return KeyPressedEvent(NULL, CtlKeys[])
+        return KeyPressedEvent(NULL, ctl)
     elseif any(isequal(sequence), Char(0x01):Char(0x1A)) # CTRL + key
-        return KeyPressedEvent(Char(UInt8(sequence)-0x01+UInt8('a')), [CTRL])
+        return KeyPressedEvent(Char(UInt8(sequence)-0x01+UInt8('a')), ctrl_ctl)
     elseif any(isequal(sequence), Char(0x0C):Char(0x1F)) # CTRL + key
-        return KeyPressedEvent(Char(UInt8(sequence)-0x1C+UInt8('4')), [CTRL])
+        return KeyPressedEvent(Char(UInt8(sequence)-0x1C+UInt8('4')), ctrl_ctl)
     else # single char
-        return KeyPressedEvent(sequence, CtlKeys[])
+        return KeyPressedEvent(sequence, ctl)
     end
 end
 
@@ -40,9 +48,7 @@ function parse_esc_leaded_sequence(sequence::String, state::Int)
     elseif c == '[' # Some CSI sequence
         return parse_csi(sequence, state)
     elseif iterate(sequence, state) === nothing # ALT + key
-        e = parse_single_char_sequence(c)
-        push!(e.ctls, ALT)
-        return e
+        return parse_single_char_sequence(c, is_alt=true)
     end
 
     return PasteEvent(sequence) # fallback
@@ -54,7 +60,7 @@ function parse_xterm_f1_2_f4(sequence::String, state::Int)
 
     (c, state) = next
     if any(isequal(c), 'P':'S')
-        return KeyPressedEvent(SpetialKeys(UInt8(c)-UInt8('P')), CtlKeys[])
+        return KeyPressedEvent(SpetialKeys(UInt8(c)-UInt8('P')))
     end
 
     return PasteEvent(sequence) # fallback
@@ -73,14 +79,14 @@ function parse_csi(sequence::String, state::Int)
             code, ctls_code = tryparse.(Int, split(code_sequence, ';'))
             (code === nothing || ctls_code === nothing) && (return PasteEvent(sequence))  # fallback
             ctls = parse_ctl_code(ctls_code)
-            (ctls == [-1]) && (return PasteEvent(sequence))  # fallback
+            (ctls == -1) && (return PasteEvent(sequence))  # fallback
         else # without ctl keys
             # +------------------------------------------------------+
             # | the form of the sequence: "\e[<code>~" and code=1:35 |
             # +------------------------------------------------------+
             code = tryparse(Int, code_sequence)
             (code === nothing) && (return PasteEvent(sequence))  # fallback
-            ctls = CtlKeys[]
+            ctls = NO_CTL
         end
 
         return parse_vt_code(sequence, code, ctls=ctls)
@@ -101,11 +107,11 @@ function parse_csi(sequence::String, state::Int)
                 code = Int(c)
             end
 
-            # construct CtlKeys array
+            # construct CtlKey array
             ctls_code = tryparse(Int, string(code_sequence[1]))
             (ctls_code === nothing) && (return PasteEvent(sequence)) # fallback
             ctls = parse_ctl_code(ctls_code)
-            (ctls == [-1]) && (return PasteEvent(sequence))  # fallback
+            (ctls == -1) && (return PasteEvent(sequence))  # fallback
         else # without ctl keys (not including F1 - F4)
             # +----------------------------------------------------+
             # | the form of the sequence: "\e[<code>" and code=A:Z |
@@ -115,15 +121,15 @@ function parse_csi(sequence::String, state::Int)
             # determing key code
             code = Int(code_sequence[1])
 
-            # construct CtlKeys array
-            ctls = CtlKeys[]
+            # construct CtlKey
+            ctls = NO_CTL
         end
 
         return parse_xterm_code(sequence, code, ctls=ctls)
     end
 end
 
-function parse_vt_code(sequence::String, code::Int; ctls=CtlKeys[])
+function parse_vt_code(sequence::String, code::Int; ctls=NO_CTL)
     if code in 1:6 # HOME INSERT DELETE END PAGEUP PAGEDOWN
         enum_bias = 11
         return KeyPressedEvent(SpetialKeys(code+enum_bias), ctls)
@@ -142,7 +148,7 @@ function parse_vt_code(sequence::String, code::Int; ctls=CtlKeys[])
     return PasteEvent(sequence) # fallback
 end
 
-function parse_xterm_code(sequence::String, code::Int; ctls=CtlKeys[])
+function parse_xterm_code(sequence::String, code::Int; ctls=NO_CTL)
     if code in Int('A'):Int('D') || code == Int('Z') # UP DOWN RIGHT LEFT BACKTAB
         return KeyPressedEvent(SpetialKeys(code), ctls)
     elseif code == Int('F') # END
@@ -159,17 +165,9 @@ function parse_xterm_code(sequence::String, code::Int; ctls=CtlKeys[])
 end
 
 function parse_ctl_code(code::Int)
-    if  code in [2, 3, 5]
-        return [CtlKeys(code)]
-    elseif code == 4
-        return [SHIFT, ALT]
-    elseif code == 6
-        return [SHIFT, CTRL]
-    elseif code == 7
-        return [CTRL, ALT]
-    elseif code == 8
-        return [SHIFT, CTRL, ALT]
+    if  code in 2:8
+        return CtlKey(code)
     end
 
-    return [-1] # fallback
+    return -1 # fallback
 end
