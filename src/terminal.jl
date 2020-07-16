@@ -3,6 +3,7 @@ using REPL
 export # wrapping
     CSI,
     displaysize,
+    raw!,
     cmove_up,
     cmove_down,
     cmove_left,
@@ -12,7 +13,6 @@ export # wrapping
     cmove_col,
     clear,
     clear_line,
-    raw!,
     beep,
     enable_bracketed_paste,
     disable_bracketed_paste,
@@ -25,7 +25,9 @@ export # extensions
 export # utils
     read_next_char,
     init_term,
-    read_buffer
+    read_strem_bytes,
+    read_strem,
+    flush
 
 # +---------------------------+
 # | wrpping of REPL.Terminals |
@@ -34,46 +36,125 @@ export # utils
 const CSI = REPL.Terminals.CSI
 
 displaysize(; t=term) = REPL.Terminals.displaysize(t)
-
-cmove_up(n::Int; t=term) = REPL.Terminals.cmove_up(t, n)
-cmove_up(; t=term) = REPL.Terminals.cmove_up(t)
-cmove_down(n::Int; t=term) = REPL.Terminals.cmove_down(t, n)
-cmove_down(; t=term) = REPL.Terminals.cmove_down(t)
-cmove_left(n::Int; t=term) = REPL.Terminals.cmove_left(t, n)
-cmove_left(; t=term) = REPL.Terminals.cmove_left(t)
-cmove_right(n::Int; t=term) = REPL.Terminals.cmove_right(t, n)
-cmove_right(; t=term) = REPL.Terminals.cmove_right(t)
-cmove_line_up(n::Int; t=term) = REPL.Terminals.cmove_line_up(t, n) # CSI n F
-cmove_line_up(; t=term) = REPL.Terminals.cmove_line_up(t)
-cmove_line_down(n::Int; t=term) = REPL.Terminals.cmove_line_down(t, n) # SCI n E
-cmove_line_down(; t=term) = REPL.Terminals.cmove_line_down(t)
-cmove_col(n::Int; t=term) = REPL.Terminals.cmove_col(t, n) # SCI n G
-
-clear(; t=term) = REPL.Terminals.clear(t)
-clear_line(t=term) =  REPL.Terminals.clear_line(t)
-
 raw!(enable::Bool; t=term) = REPL.Terminals.raw!(t, enable)
 
-beep(; t=term) = REPL.Terminals.beep(t)
-enable_bracketed_paste(; t=term) = REPL.Terminals.enable_bracketed_paste(t)
-disable_bracketed_paste(; t=term) = REPL.Terminals.disable_bracketed_paste(t)
-end_keypad_transmit_mode(; t=term) = REPL.Terminals.end_keypad_transmit_mode(t)
+function cmove_up(n::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, "$(CSI)$(n)A")
+end
+function cmove_up(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    cmove_up(1, stream=stream)
+end
+function cmove_down(n::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, "$(CSI)$(n)B")
+end
+function cmove_down(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    cmove_down(1, stream=stream)
+end
+function cmove_right(n::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, "$(CSI)$(n)C")
+end
+function cmove_right(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    cmove_right(1, stream=stream)
+end
+function cmove_left(n::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, "$(CSI)$(n)D")
+end
+function cmove_left(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    cmove_left(1, stream=stream)
+end
+function cmove_col(n::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    (write(stream, '\r'); n > 1 && cmove_right(n-1, stream=stream)) # SCI n G
+end
+function cmove_col(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    cmove_col(1, stream=stream)
+end
+function cmove_line_up(n::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    (cmove_up(n, stream=stream); cmove_col(stream=stream)) # CSI n F
+end
+function cmove_line_up(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    cmove_line_up(1, stream=stream)
+end
+function cmove_line_down(n::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    (cmove_down(n, stream=stream); cmove_col(stream=stream)) # SCI n E
+end
+function cmove_line_down(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    cmove_line_down(1, stream=stream)
+end
+
+@eval function clear(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, $"$(CSI)H$(CSI)2J")
+end
+@eval function clear_line(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, $"\r$(CSI)0K")
+end
+
+beep(; stream=err_stream) = write(stream,"\x7")
+
+@eval function enable_bracketed_paste(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, $"$(CSI)?2004h")
+end
+@eval function disable_bracketed_paste(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, $"$(CSI)?2004l")
+end
+@eval function end_keypad_transmit_mode(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, $"$(CSI)?1l\x1b>")
+end
 
 # +------------+
 # | extensions |
 # +------------+
 
-displaysize(height::Int, width::Int; t=term) = write(t.out_stream, "$(CSI)8;$(height);$(width)t")
+function displaysize(height::Int, width::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, "$(CSI)8;$(height);$(width)t")
+end
 
-cmove(y::Int, x::Int; t=term) = write(t.out_stream, "$(CSI)$(y);$(x)H")
-cmove_line_last(; t=term) = write(t.out_stream, "$(CSI)$(displaysize()[1]);1H")
+function cmove(y::Int, x::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, "$(CSI)$(y);$(x)H")
+end
+function cmove_line_last(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, "$(CSI)$(displaysize()[1]);1H")
+end
 
-clear_line(row::Int; t=term) = (write(t.out_stream, "$(CSI)$(row);1H"); clear_line())
+function clear_line(row::Int; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    (write(stream, "$(CSI)$(row);1H"); clear_line())
+end
 
-cshow(enable=true; t=term) = enable ? write(t.out_stream, "$(CSI)?25h") : write(t.out_stream, "$(CSI)?25l")
+function cshow(enable=true; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    enable ? write(stream, "$(CSI)?25h") : write(stream, "$(CSI)?25l")
+end
 
-csave(; t=term) = write(t.out_stream, "$(CSI)s")
-crestore(; t=term) = write(t.out_stream, "$(CSI)u")
+function csave(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, "$(CSI)s")
+end
+function crestore(; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    write(stream, "$(CSI)u")
+end
 
 # +-------+
 # | utils |
@@ -88,7 +169,7 @@ end
 
 read_next_byte(io::IO) = read(io, 1)[1]
 
-function read_buffer_bytes(; stream=term.in_stream)
+function read_strem_bytes(; stream=in_stream)
     queue = UInt8[]
 
     push!(queue, read_next_byte(stream))
@@ -105,4 +186,6 @@ end
 
 read_next_char(io::IO) = Char(read_next_byte(io))
 
-read_buffer(; stream=term.in_stream) = String(read_buffer_bytes(stream=stream))
+read_strem(; stream=in_stream) = String(read_strem_bytes(stream=stream))
+
+flush(; stream=out_stream, buffer=buffered_out_stream) = write(stream, read_strem(stream=buffered_out_stream))
