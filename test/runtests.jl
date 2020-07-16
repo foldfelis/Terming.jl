@@ -99,7 +99,7 @@ fake_input(key::String; t=T.term) = print(t.in_stream, key)
 
 @testset "Terming.jl" begin
 
-    T.set_term!(FakeTerminal(
+    T.set_term!(t=FakeTerminal(
         Base.BufferStream(), Base.BufferStream(), Base.BufferStream()
     ))
 
