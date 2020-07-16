@@ -39,7 +39,7 @@
     T.raw!(false)
     @test T.term.raw == false
 
-    T.beep() # does this function ever work?? >_<
+    T.beep()
     @test T.read_next_char(T.err_stream) == '\x7'
     T.enable_bracketed_paste()
     @test T.read_buffer(stream=T.out_stream) == "$(T.CSI)?2004h"
@@ -89,5 +89,77 @@ end
     @test T.read_buffer() == "\e[Z"
 
     T.raw!(false)
+
+end
+
+@testset "buffered" begin
+
+    @testset "terminal.wrapping" begin
+
+    T.cmove_up(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)1A"
+    T.cmove_up(5, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)5A"
+    T.cmove_down(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)1B"
+    T.cmove_down(5, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)5B"
+    T.cmove_left(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)1D"
+    T.cmove_left(5, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)5D"
+    T.cmove_right(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)1C"
+    T.cmove_right(5, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)5C"
+    T.cmove_line_up(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)1A\r"
+    T.cmove_line_up(5, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)5A\r"
+    T.cmove_line_down(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)1B\r"
+    T.cmove_line_down(5, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)5B\r"
+    T.cmove_col(5, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "\r$(T.CSI)4C"
+
+    T.clear(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)H$(T.CSI)2J"
+    T.clear_line(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "\r$(T.CSI)0K"
+
+    T.enable_bracketed_paste(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)?2004h"
+    T.disable_bracketed_paste(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)?2004l"
+    T.end_keypad_transmit_mode(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)?1l\e>"
+
+    end
+
+    @testset "terminal.extension" begin
+
+    T.displaysize(30, 50, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)8;$(30);$(50)t"
+
+    T.cmove(6, 5, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)6;5H"
+
+    T.cmove_line_last(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)24;1H"
+
+    T.cshow(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)?25h"
+
+    T.cshow(false, buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)?25l"
+
+    T.csave(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)s"
+
+    T.crestore(buffered=true)
+    @test T.read_buffer(stream=T.buffered_out_stream) == "$(T.CSI)u"
+
+    end
 
 end
