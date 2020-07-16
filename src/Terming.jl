@@ -4,7 +4,8 @@ module Terming
     include("event.jl")
     include("parser.jl")
 
-    export buffered_out_stream, term, in_stream, out_stream, err_stream, set_term!
+    export buffered_out_stream, term, in_stream, out_stream, err_stream
+    export set_term!
 
     const buffered_out_stream = Base.BufferStream()
 
@@ -14,10 +15,10 @@ module Terming
     err_stream = nothing
 
     function __init__()
-        init_term()
+        set_term!(init_term())
     end
 
-    function set_term!(; t=init_term())
+    function set_term!(t::REPL.Terminals.UnixTerminal)
         global term = t
         global in_stream = t.in_stream
         global out_stream = t.out_stream
