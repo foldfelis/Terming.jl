@@ -22,6 +22,12 @@ export # extensions
     cmove,
     clear_line
 
+export # io
+    write,
+    print,
+    println,
+    join
+
 export # utils
     read_next_char,
     init_term,
@@ -40,7 +46,7 @@ raw!(enable::Bool; t=term) = REPL.Terminals.raw!(t, enable)
 
 function cmove_up(n::Int; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, "$(CSI)$(n)A")
+    Base.write(stream, "$(CSI)$(n)A")
 end
 function cmove_up(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
@@ -48,7 +54,7 @@ function cmove_up(; stream=out_stream, buffered=false)
 end
 function cmove_down(n::Int; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, "$(CSI)$(n)B")
+    Base.write(stream, "$(CSI)$(n)B")
 end
 function cmove_down(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
@@ -56,7 +62,7 @@ function cmove_down(; stream=out_stream, buffered=false)
 end
 function cmove_right(n::Int; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, "$(CSI)$(n)C")
+    Base.write(stream, "$(CSI)$(n)C")
 end
 function cmove_right(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
@@ -64,7 +70,7 @@ function cmove_right(; stream=out_stream, buffered=false)
 end
 function cmove_left(n::Int; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, "$(CSI)$(n)D")
+    Base.write(stream, "$(CSI)$(n)D")
 end
 function cmove_left(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
@@ -72,7 +78,7 @@ function cmove_left(; stream=out_stream, buffered=false)
 end
 function cmove_col(n::Int; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    (write(stream, '\r'); n > 1 && cmove_right(n-1, stream=stream)) # SCI n G
+    (Base.write(stream, '\r'); n > 1 && cmove_right(n-1, stream=stream)) # SCI n G
 end
 function cmove_col(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
@@ -97,26 +103,26 @@ end
 
 @eval function clear(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, $"$(CSI)H$(CSI)2J")
+    Base.write(stream, $"$(CSI)H$(CSI)2J")
 end
 @eval function clear_line(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, $"\r$(CSI)0K")
+    Base.write(stream, $"\r$(CSI)0K")
 end
 
-beep(; stream=err_stream) = write(stream,"\x7")
+beep(; stream=err_stream) = Base.write(stream,"\x7")
 
 @eval function enable_bracketed_paste(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, $"$(CSI)?2004h")
+    Base.write(stream, $"$(CSI)?2004h")
 end
 @eval function disable_bracketed_paste(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, $"$(CSI)?2004l")
+    Base.write(stream, $"$(CSI)?2004l")
 end
 @eval function end_keypad_transmit_mode(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, $"$(CSI)?1l\x1b>")
+    Base.write(stream, $"$(CSI)?1l\x1b>")
 end
 
 # +------------+
@@ -125,35 +131,56 @@ end
 
 function displaysize(height::Int, width::Int; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, "$(CSI)8;$(height);$(width)t")
+    Base.write(stream, "$(CSI)8;$(height);$(width)t")
 end
 
 function cmove(y::Int, x::Int; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, "$(CSI)$(y);$(x)H")
+    Base.write(stream, "$(CSI)$(y);$(x)H")
 end
 function cmove_line_last(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, "$(CSI)$(displaysize()[1]);1H")
+    Base.write(stream, "$(CSI)$(displaysize()[1]);1H")
 end
 
 function clear_line(row::Int; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    (write(stream, "$(CSI)$(row);1H"); clear_line())
+    (Base.write(stream, "$(CSI)$(row);1H"); clear_line())
 end
 
 function cshow(enable=true; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    enable ? write(stream, "$(CSI)?25h") : write(stream, "$(CSI)?25l")
+    enable ? Base.write(stream, "$(CSI)?25h") : Base.write(stream, "$(CSI)?25l")
 end
 
 function csave(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, "$(CSI)s")
+    Base.write(stream, "$(CSI)s")
 end
 function crestore(; stream=out_stream, buffered=false)
     stream = buffered ? buffered_out_stream : stream
-    write(stream, "$(CSI)u")
+    Base.write(stream, "$(CSI)u")
+end
+
+# +----+
+# | IO |
+# +----+
+
+function write(args...; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    Base.write(stream, args...)
+end
+function print(args...; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    Base.print(stream, args...)
+end
+function println(args...; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    Base.println(stream, args...)
+end
+function join(args...; stream=out_stream, buffered=false)
+    stream = buffered ? buffered_out_stream : stream
+    Base.join(stream, args...)
 end
 
 # +-------+
@@ -188,4 +215,4 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 
 read_strem(; stream=in_stream) = String(read_strem_bytes(stream=stream))
 
-flush(; stream=out_stream, buffer=buffered_out_stream) = write(stream, read_strem(stream=buffered_out_stream))
+flush(; stream=out_stream, buffer=buffered_out_stream) = Base.write(stream, read_strem(stream=buffered_out_stream))

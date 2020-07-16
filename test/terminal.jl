@@ -75,6 +75,32 @@ end
 
 end
 
+@testset "io" begin
+
+    T.write("a")
+    @test T.read_strem(stream=T.out_stream) == "a"
+
+    T.write("a", "a")
+    @test T.read_strem(stream=T.out_stream) == "aa"
+
+    T.print("a")
+    @test T.read_strem(stream=T.out_stream) == "a"
+
+    T.print("a", "a")
+    @test T.read_strem(stream=T.out_stream) == "aa"
+
+    T.println("a")
+    @test T.read_strem(stream=T.out_stream) == "a\n"
+
+    T.println("a", "a")
+    @test T.read_strem(stream=T.out_stream) == "aa\n"
+
+    list = ["a", "b", "c", "d"]
+    T.join(list, ", ", " and ")
+    @test T.read_strem(stream=T.out_stream) == "a, b, c and d"
+
+end
+
 @testset "terminal.utils" begin
 
     T.raw!(true)
@@ -165,7 +191,7 @@ end
     @testset "utils" begin
 
         str = "This stream will be sand into buffered then into stdout"
-        write(T.buffered_out_stream, str)
+        Base.write(T.buffered_out_stream, str)
 
         T.flush()
         @test T.read_strem(stream=T.out_stream) == str
