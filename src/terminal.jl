@@ -25,7 +25,8 @@ export # extensions
 export # utils
     read_next_char,
     init_term,
-    read_buffer
+    read_buffer,
+    flush
 
 # +---------------------------+
 # | wrpping of REPL.Terminals |
@@ -185,3 +186,5 @@ end
 read_next_char(io::IO) = Char(read_next_byte(io))
 
 read_buffer(; stream=in_stream) = String(read_buffer_bytes(stream=stream))
+
+flush(; stream=out_stream, buffer=buffered_out_stream) = write(stream, read_buffer(stream=buffered_out_stream))

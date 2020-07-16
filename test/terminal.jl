@@ -162,4 +162,14 @@ end
 
     end
 
+    @testset "utils" begin
+
+        str = "This stream will be sand into buffered then into stdout"
+        write(T.buffered_out_stream, str)
+
+        T.flush()
+        @test T.read_buffer(stream=T.out_stream) == str
+
+    end
+
 end
