@@ -41,7 +41,7 @@ const T = Terming
 #     function handle_quit(app::App)
 #         keep_running = false
 #         foreach(close, app.pipeline)
-#         println(T.term.out_stream, "Shutted down...")
+#         T.println("Shutted down...")
 
 #         return keep_running
 #     end
