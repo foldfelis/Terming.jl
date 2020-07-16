@@ -39,7 +39,7 @@ fake_input(key::String; t=T.term) = print(t.in_stream, key)
 #     function init_pipeline(size=Inf)
 #         sequence_queue = Channel{String}(size, spawn=true) do ch
 #             while true
-#                 sequence = T.read_buffer()
+#                 sequence = T.read_strem()
 #                 put!(ch, sequence)
 #             end
 #         end
