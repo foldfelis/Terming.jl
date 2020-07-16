@@ -26,7 +26,7 @@ end
 
 REPL.Terminals.displaysize(::FakeTerminal) = (24, 80)
 
-fake_input(key::String; t=T.term) = print(t.in_stream, key)
+fake_input(key::String; t=T.term) = Base.print(t.in_stream, key)
 
 # @testset "manual" begin
 

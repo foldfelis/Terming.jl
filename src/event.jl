@@ -54,7 +54,7 @@ abstract type Event end
 
 struct QuitEvent <: Event end
 
-Base.show(io::IO, ::QuitEvent) = print(io, "QuitEvent")
+Base.show(io::IO, ::QuitEvent) = Base.print(io, "QuitEvent")
 
 struct KeyPressedEvent <: Event
     key::Union{Char, SpetialKeys}
@@ -65,11 +65,11 @@ KeyPressedEvent(key::Union{Char, SpetialKeys}) = KeyPressedEvent(key, NO_CTL)
 
 function Base.show(io::IO, e::KeyPressedEvent)
     ctl = (e.ctl === NO_CTL) ? "" : "$(string.(e.ctl))+"
-    print(io, "KeyPressedEvent($(ctl)'$(string(e.key))')")
+    Base.print(io, "KeyPressedEvent($(ctl)'$(string(e.key))')")
 end
 
 struct PasteEvent <: Event
     content::String
 end
 
-Base.show(io::IO, e::PasteEvent) = print(io, "PasteEvent(\"$(e.content)\")")
+Base.show(io::IO, e::PasteEvent) = Base.print(io, "PasteEvent(\"$(e.content)\")")
