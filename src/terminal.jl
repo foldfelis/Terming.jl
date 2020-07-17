@@ -1,4 +1,6 @@
 using REPL
+using MacroTools
+M = MacroTools
 
 export # wrapping
     CSI,
@@ -20,7 +22,11 @@ export # wrapping
 
 export # extensions
     cmove,
-    clear_line
+    clear_line,
+    cmove_line_last,
+    cshow,
+    csave,
+    crestore
 
 export # io
     write,
@@ -129,13 +135,10 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 read_strem(; stream=in_stream) = String(read_strem_bytes(stream=stream))
 
 macro buffered(expr::Expr)
-    if expr.head === :block
-        for (i, call_expr) in enumerate(expr.args)
-            (call_expr isa Expr && call_expr.head === :call) && push!(expr.args[i].args, Expr(:kw, :stream, :buffer))
-        end
-    else
-        (expr isa Expr && expr.head === :call) && push!(expr.args, Expr(:kw, :stream, :buffer))
-    end
+    expr = M.postwalk(
+        x->M.@capture(x, (namespace_.f_|f_)(argv__)) ? _redirect_stream(namespace, f, argv) : x,
+        expr
+    )
 
     expr = quote
         buffer = Base.BufferStream()
@@ -144,6 +147,42 @@ macro buffered(expr::Expr)
     end
 
     return esc(expr)
+end
+
+function _redirect_stream(namespace, f, argv)
+
+    bufferable = [
+        :cmove_up,
+        :cmove_down,
+        :cmove_left,
+        :cmove_right,
+        :cmove_line_up,
+        :cmove_line_down,
+        :cmove_col,
+        :clear,
+        :clear_line,
+        :enable_bracketed_paste,
+        :disable_bracketed_paste,
+        :end_keypad_transmit_mode,
+        :cmove,
+        :cmove_line_last,
+        :cshow,
+        :csave,
+        :crestore,
+        :write,
+        :print,
+        :println,
+        :join
+    ]
+
+    if f in bufferable
+        (namespace === nothing) && return :($f($(argv...), stream=buffer))
+        (namespace === :Base) && return :($namespace.$f($(argv...)))
+        return :($namespace.$f($(argv...), stream=buffer))
+    end
+
+    (namespace === nothing) && return :($f($(argv...)))
+    return :($namespace.$f($(argv...)))
 end
 
 flush(; stream=out_stream, buffer::Base.BufferStream) = Base.write(stream, read_strem(stream=buffer))

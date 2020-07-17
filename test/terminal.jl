@@ -127,7 +127,27 @@ end
     end
     @test T.read_strem(stream=out_stream) == "\e[3;5Happleorange\e[s"
 
+    T.@buffered T.cmove(3, 5); T.print("apple", "orange"); T.csave()
+    @test T.read_strem(stream=out_stream) == "\e[3;5Happleorange\e[s"
+
     T.@buffered T.print("apple", "orange")
     @test T.read_strem(stream=out_stream) == "appleorange"
 
+    io = IOBuffer()
+    dummy(i) = i
+    T.@buffered begin
+        for i=1:5
+            dummy(i)
+        end
+        T.cmove(3, 5)
+        T.print("apple", "orange")
+        Base.print(io, "This dont show")
+        T.csave()
+        for i=1:5
+            T.cmove(3, 5)
+            T.print("apple", "orange")
+            T.csave()
+        end
+    end
+    @test T.read_strem(stream=out_stream) == "\e[3;5Happleorange\e[s"^6
 end
