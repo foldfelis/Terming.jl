@@ -33,6 +33,7 @@ export # utils
     init_term,
     read_strem_bytes,
     read_strem,
+    @buffered,
     flush
 
 export FakeTerminal, fake_input
