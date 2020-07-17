@@ -127,7 +127,26 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 
 read_strem(; stream=in_stream) = String(read_strem_bytes(stream=stream))
 
-# flush(; stream=out_stream, buffer=buffered_out_stream) = Base.write(stream, read_strem(stream=buffered_out_stream))
+macro buffered(expr::Expr)
+    for arg in expr.args
+        if arg isa Expr && arg.head === :call
+            # if function call includes namespace, remove it.
+            (arg.args[1] isa Expr) && (arg.args[1] = arg.args[1].args[2].value)
+            # redirect out_stream to buffer stream
+            push!(arg.args, Expr(:kw, :stream, :buffer))
+        end
+    end
+
+    expr = quote
+        buffer = Base.BufferStream()
+        $expr
+        flush(buffer=buffer)
+    end
+
+    return expr
+end
+
+flush(; stream=out_stream, buffer::Base.BufferStream) = Base.write(stream, read_strem(stream=buffer))
 
 # +---------------+
 # | fake terminal |
