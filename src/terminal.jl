@@ -129,40 +129,21 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 read_strem(; stream=in_stream) = String(read_strem_bytes(stream=stream))
 
 macro buffered(expr::Expr)
-    expr = redirect_stream(expr)
-
-    expr = quote
-        buffer = Base.BufferStream()
-        $expr
-        flush(buffer=buffer)
-    end
-
-    return expr
-end
-
-macro buffered(::String, expr::Expr)
-    for call_expr in expr.args
-        call_expr = redirect_stream(call_expr)
+    if expr.head === :block
+        for (i, call_expr) in enumerate(expr.args)
+            (call_expr isa Expr && call_expr.head === :call) && push!(expr.args[i].args, Expr(:kw, :stream, :buffer))
+        end
+    else
+        (expr isa Expr && expr.head === :call) && push!(expr.args, Expr(:kw, :stream, :buffer))
     end
 
     expr = quote
         buffer = Base.BufferStream()
         $expr
-        flush(buffer=buffer)
+        Terming.flush(buffer=buffer)
     end
 
-    return expr
-end
-
-function redirect_stream(call_expr)
-    if call_expr isa Expr && call_expr.head === :call
-        # if function call includes namespace, remove it.
-        (call_expr.args[1] isa Expr) && (call_expr.args[1] = call_expr.args[1].args[2].value)
-        # redirect out_stream to buffer stream
-        push!(call_expr.args, Expr(:kw, :stream, :buffer))
-    end
-
-    return call_expr
+    return esc(expr)
 end
 
 flush(; stream=out_stream, buffer::Base.BufferStream) = Base.write(stream, read_strem(stream=buffer))

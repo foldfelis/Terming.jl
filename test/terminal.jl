@@ -120,16 +120,12 @@ end
 
 @testset "buffered" begin
 
-    T.@buffered "Buffer" begin
+    T.@buffered begin
         T.cmove(3, 5)
         T.print("apple", "orange")
         T.csave()
-
-        cmove(3, 5)
-        print("apple", "orange")
-        csave()
     end
-    @test T.read_strem(stream=out_stream) == "\e[3;5Happleorange\e[s"^2
+    @test T.read_strem(stream=out_stream) == "\e[3;5Happleorange\e[s"
 
     T.@buffered T.print("apple", "orange")
     @test T.read_strem(stream=out_stream) == "appleorange"
