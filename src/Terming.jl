@@ -4,10 +4,8 @@ module Terming
     include("event.jl")
     include("parser.jl")
 
-    export buffered_out_stream, term, in_stream, out_stream, err_stream
+    export term, in_stream, out_stream, err_stream
     export set_term!
-
-    const buffered_out_stream = Base.BufferStream()
 
     term = nothing
     in_stream = nothing
