@@ -46,144 +46,54 @@ const CSI = REPL.Terminals.CSI
 displaysize(; t=term) = REPL.Terminals.displaysize(t)
 raw!(enable::Bool; t=term) = REPL.Terminals.raw!(t, enable)
 
-function cmove_up(n::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, "$(CSI)$(n)A")
-end
-function cmove_up(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    cmove_up(1, stream=stream)
-end
-function cmove_down(n::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, "$(CSI)$(n)B")
-end
-function cmove_down(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    cmove_down(1, stream=stream)
-end
-function cmove_right(n::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, "$(CSI)$(n)C")
-end
-function cmove_right(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    cmove_right(1, stream=stream)
-end
-function cmove_left(n::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, "$(CSI)$(n)D")
-end
-function cmove_left(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    cmove_left(1, stream=stream)
-end
-function cmove_col(n::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    (Base.write(stream, '\r'); n > 1 && cmove_right(n-1, stream=stream)) # SCI n G
-end
-function cmove_col(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    cmove_col(1, stream=stream)
-end
-function cmove_line_up(n::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    (cmove_up(n, stream=stream); cmove_col(stream=stream)) # CSI n F
-end
-function cmove_line_up(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    cmove_line_up(1, stream=stream)
-end
-function cmove_line_down(n::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    (cmove_down(n, stream=stream); cmove_col(stream=stream)) # SCI n E
-end
-function cmove_line_down(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    cmove_line_down(1, stream=stream)
-end
+cmove_up(n::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(n)A")
+cmove_up(; stream=out_stream) = cmove_up(1, stream=stream)
+cmove_down(n::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(n)B")
+cmove_down(; stream=out_stream) = cmove_down(1, stream=stream)
+cmove_right(n::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(n)C")
+cmove_right(; stream=out_stream) = cmove_right(1, stream=stream)
+cmove_left(n::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(n)D")
+cmove_left(; stream=out_stream) = cmove_left(1, stream=stream)
+cmove_col(n::Int; stream=out_stream) = (Base.write(stream, '\r'); n > 1 && cmove_right(n-1, stream=stream)) # SCI n G
+cmove_col(; stream=out_stream) = cmove_col(1, stream=stream)
+cmove_line_up(n::Int; stream=out_stream) = (cmove_up(n, stream=stream); cmove_col(stream=stream)) # CSI n F
+cmove_line_up(; stream=out_stream) = cmove_line_up(1, stream=stream)
+cmove_line_down(n::Int; stream=out_stream) = (cmove_down(n, stream=stream); cmove_col(stream=stream)) # SCI n E
+cmove_line_down(; stream=out_stream) = cmove_line_down(1, stream=stream)
 
-@eval function clear(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, $"$(CSI)H$(CSI)2J")
-end
-@eval function clear_line(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, $"\r$(CSI)0K")
-end
+@eval clear(; stream=out_stream) = Base.write(stream, $"$(CSI)H$(CSI)2J")
+@eval clear_line(; stream=out_stream) = Base.write(stream, $"\r$(CSI)0K")
 
 beep(; stream=err_stream) = Base.write(stream,"\x7")
 
-@eval function enable_bracketed_paste(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, $"$(CSI)?2004h")
-end
-@eval function disable_bracketed_paste(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, $"$(CSI)?2004l")
-end
-@eval function end_keypad_transmit_mode(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, $"$(CSI)?1l\x1b>")
-end
+@eval enable_bracketed_paste(; stream=out_stream) = Base.write(stream, $"$(CSI)?2004h")
+@eval disable_bracketed_paste(; stream=out_stream) = Base.write(stream, $"$(CSI)?2004l")
+@eval end_keypad_transmit_mode(; stream=out_stream) = Base.write(stream, $"$(CSI)?1l\x1b>")
 
 # +------------+
 # | extensions |
 # +------------+
 
-function displaysize(height::Int, width::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, "$(CSI)8;$(height);$(width)t")
-end
+displaysize(height::Int, width::Int; stream=out_stream) = Base.write(stream, "$(CSI)8;$(height);$(width)t")
 
-function cmove(y::Int, x::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, "$(CSI)$(y);$(x)H")
-end
-function cmove_line_last(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, "$(CSI)$(displaysize()[1]);1H")
-end
+cmove(y::Int, x::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(y);$(x)H")
+cmove_line_last(; stream=out_stream) = Base.write(stream, "$(CSI)$(displaysize()[1]);1H")
 
-function clear_line(row::Int; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    (Base.write(stream, "$(CSI)$(row);1H"); clear_line())
-end
+clear_line(row::Int; stream=out_stream) = (Base.write(stream, "$(CSI)$(row);1H"); clear_line())
 
-function cshow(enable=true; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    enable ? Base.write(stream, "$(CSI)?25h") : Base.write(stream, "$(CSI)?25l")
-end
+cshow(enable=true; stream=out_stream) = (enable ? Base.write(stream, "$(CSI)?25h") : Base.write(stream, "$(CSI)?25l"))
 
-function csave(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, "$(CSI)s")
-end
-function crestore(; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, "$(CSI)u")
-end
+csave(; stream=out_stream) = Base.write(stream, "$(CSI)s")
+crestore(; stream=out_stream) = Base.write(stream, "$(CSI)u")
 
 # +----+
 # | IO |
 # +----+
 
-function write(args...; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.write(stream, args...)
-end
-function print(args...; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.print(stream, args...)
-end
-function println(args...; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.println(stream, args...)
-end
-function join(args...; stream=out_stream, buffered=false)
-    stream = buffered ? buffered_out_stream : stream
-    Base.join(stream, args...)
-end
+write(args...; stream=out_stream) = Base.write(stream, args...)
+print(args...; stream=out_stream) = Base.print(stream, args...)
+println(args...; stream=out_stream) = Base.println(stream, args...)
+join(args...; stream=out_stream) = Base.join(stream, args...)
 
 # +-------+
 # | utils |
@@ -217,7 +127,7 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 
 read_strem(; stream=in_stream) = String(read_strem_bytes(stream=stream))
 
-flush(; stream=out_stream, buffer=buffered_out_stream) = Base.write(stream, read_strem(stream=buffered_out_stream))
+# flush(; stream=out_stream, buffer=buffered_out_stream) = Base.write(stream, read_strem(stream=buffered_out_stream))
 
 # +---------------+
 # | fake terminal |
@@ -237,9 +147,7 @@ FakeTerminal(in::Base.IO, out::Base.IO, err::Base.IO) = FakeTerminal(
     false
 )
 
-function REPL.Terminals.raw!(t::FakeTerminal, raw::Bool)
-    t.raw = raw
-end
+REPL.Terminals.raw!(t::FakeTerminal, raw::Bool) = (t.raw = raw)
 
 REPL.Terminals.displaysize(::FakeTerminal) = (24, 80)
 
