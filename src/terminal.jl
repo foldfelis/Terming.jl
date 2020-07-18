@@ -21,6 +21,7 @@ export # wrapping
     end_keypad_transmit_mode
 
 export # extensions
+    displaysize,
     cmove,
     clear_line,
     cmove_line_last,
@@ -134,6 +135,8 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 
 read_strem(; stream=in_stream) = String(read_strem_bytes(stream=stream))
 
+flush(; stream=out_stream, buffer::Base.BufferStream) = Base.write(stream, read_strem(stream=buffer))
+
 macro buffered(expr::Expr)
     expr = M.postwalk(
         x->M.@capture(x, (namespace_.f_|f_)(argv__)) ? _redirect_stream(namespace, f, argv) : x,
@@ -152,6 +155,7 @@ end
 function _redirect_stream(namespace, f, argv)
 
     bufferable = [
+        :displaysize,
         :cmove_up,
         :cmove_down,
         :cmove_left,
@@ -184,8 +188,6 @@ function _redirect_stream(namespace, f, argv)
     (namespace === nothing) && return :($f($(argv...)))
     return :($namespace.$f($(argv...)))
 end
-
-flush(; stream=out_stream, buffer::Base.BufferStream) = Base.write(stream, read_strem(stream=buffer))
 
 # +---------------+
 # | fake terminal |

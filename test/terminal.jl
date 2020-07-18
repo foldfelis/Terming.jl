@@ -141,7 +141,7 @@ end
         end
         T.cmove(3, 5)
         T.print("apple", "orange")
-        Base.print(io, "This dont show")
+        Base.print(io, "This don't show")
         T.csave()
         for i=1:5
             T.cmove(3, 5)
