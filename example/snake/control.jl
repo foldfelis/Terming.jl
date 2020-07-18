@@ -1,5 +1,9 @@
 include("listener.jl")
 
+struct QuitEvent <: T.Event end
+
+Base.show(io::IO, ::QuitEvent) = Base.print(io, "QuitEvent")
+
 struct App
     size::Tuple{Int, Int}
     listener::InputListener
@@ -24,11 +28,11 @@ function reset_term(::App)
     return
 end
 
-emit_quit_event(app::App) = put!(event_queue(app), T.QuitEvent())
+emit_quit_event(app::App) = put!(event_queue(app), QuitEvent())
 
 function handle_lose(app::App)
     T.cmove_line_last()
-    println(T.term.out_stream, "\nYou Lose")
+    T.println("\nYou Lose")
     emit_quit_event(app)
 end
 
@@ -37,7 +41,7 @@ function handle_quit(app::App)
     foreach(close, app.listener.pipeline)
 
     T.cmove_line_last()
-    println(T.term.out_stream, "\nShutted down...")
+    T.println("\nShutted down...")
 
     return keep_running
 end
@@ -49,7 +53,7 @@ function handle_event(app::App)
     is_running = true
     while is_running
         e = take!(event_queue(app))
-        if e === T.QuitEvent()
+        if e === QuitEvent()
             is_running = handle_quit(app)
         elseif e === LossEvent()
             handle_lose(app)

@@ -5,7 +5,7 @@ include("model.jl")
 include("view.jl")
 include("control.jl")
 
-function init_app(term_size=(30, 80))
+function App(term_size=(30, 80))
     # event queue
     listener = InputListener()
     event_queue = listener.pipeline[end]
@@ -24,7 +24,7 @@ function init_app(term_size=(30, 80))
 end
 
 function main()
-    app = init_app()
+    app = App()
     run(app)
 end
 
