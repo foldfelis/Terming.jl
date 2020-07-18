@@ -1,8 +1,5 @@
 @testset "event" begin
 
-    event = T.QuitEvent()
-    @test repr(event) === "QuitEvent"
-
     event = T.KeyPressedEvent('c', T.CTRL)
     @test event.key === 'c'
     @test event.ctl === T.CTRL
