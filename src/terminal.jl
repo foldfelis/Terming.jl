@@ -41,6 +41,7 @@ export # utils
     read_strem_bytes,
     read_strem,
     @buffered,
+    mark_bufferable,
     flush
 
 export FakeTerminal, fake_input
@@ -152,33 +153,34 @@ macro buffered(expr::Expr)
     return esc(expr)
 end
 
+bufferable = [
+    :displaysize,
+    :cmove_up,
+    :cmove_down,
+    :cmove_left,
+    :cmove_right,
+    :cmove_line_up,
+    :cmove_line_down,
+    :cmove_col,
+    :clear,
+    :clear_line,
+    :enable_bracketed_paste,
+    :disable_bracketed_paste,
+    :end_keypad_transmit_mode,
+    :cmove,
+    :cmove_line_last,
+    :cshow,
+    :csave,
+    :crestore,
+    :write,
+    :print,
+    :println,
+    :join
+]
+
+mark_bufferable(f::Symbol) = push!(bufferable, f)
+
 function _redirect_stream(namespace, f, argv)
-
-    bufferable = [
-        :displaysize,
-        :cmove_up,
-        :cmove_down,
-        :cmove_left,
-        :cmove_right,
-        :cmove_line_up,
-        :cmove_line_down,
-        :cmove_col,
-        :clear,
-        :clear_line,
-        :enable_bracketed_paste,
-        :disable_bracketed_paste,
-        :end_keypad_transmit_mode,
-        :cmove,
-        :cmove_line_last,
-        :cshow,
-        :csave,
-        :crestore,
-        :write,
-        :print,
-        :println,
-        :join
-    ]
-
     if f in bufferable
         (namespace === nothing) && return :($f($(argv...), stream=buffer))
         (namespace === :Base) && return :($namespace.$f($(argv...)))
