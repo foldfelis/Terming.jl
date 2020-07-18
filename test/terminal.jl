@@ -61,6 +61,9 @@ end
     T.cmove_line_last()
     @test T.read_strem(stream=T.out_stream) == "$(T.CSI)24;1H"
 
+    T.clear_line(5)
+    @test T.read_strem(stream=T.out_stream) == "$(T.CSI)5;1H\r$(T.CSI)0K"
+
     T.cshow()
     @test T.read_strem(stream=T.out_stream) == "$(T.CSI)?25h"
 
@@ -137,7 +140,8 @@ end
     dummy(i) = i
     T.@buffered begin
         for i=1:5
-            dummy(i)
+            the_num = dummy(i)
+            T.print(i)
         end
         T.cmove(3, 5)
         T.print("apple", "orange")
@@ -149,5 +153,5 @@ end
             T.csave()
         end
     end
-    @test T.read_strem(stream=out_stream) == "\e[3;5Happleorange\e[s"^6
+    @test T.read_strem(stream=out_stream) == "12345"*"\e[3;5Happleorange\e[s"^6
 end
