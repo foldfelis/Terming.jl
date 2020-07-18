@@ -1,5 +1,5 @@
 export SpetialKeys, CtlKey
-export Event, QuitEvent, KeyPressedEvent, PasteEvent
+export Event, KeyPressedEvent, PasteEvent
 export match
 
 @enum SpetialKeys begin
@@ -51,10 +51,6 @@ end
 end
 
 abstract type Event end
-
-struct QuitEvent <: Event end
-
-Base.show(io::IO, ::QuitEvent) = Base.print(io, "QuitEvent")
 
 struct KeyPressedEvent <: Event
     key::Union{Char, SpetialKeys}

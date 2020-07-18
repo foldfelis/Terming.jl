@@ -6,6 +6,10 @@ const T = Terming
 
 # @testset "manual" begin
 
+#     struct QuitEvent <: T.Event end
+
+#     Base.show(io::IO, ::QuitEvent) = Base.print(io, "QuitEvent")
+
 #     struct App
 #         pipeline::Vector{Channel}
 #     end
