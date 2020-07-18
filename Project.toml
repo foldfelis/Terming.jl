@@ -1,7 +1,7 @@
 name = "Terming"
 uuid = "5a1048b7-9ca6-4e8a-8e2e-1f932e78ac4e"
 authors = ["JingYu Ning <foldfelis@gmail.com> and contributors"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
