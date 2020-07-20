@@ -36,8 +36,8 @@ export # io
 export # utils
     read_next_char,
     init_term,
-    read_strem_bytes,
-    read_strem,
+    read_stream_bytes,
+    read_stream,
     flush,
     buffered
 
@@ -179,8 +179,8 @@ end
 
 read_next_char(io::IO) = Char(read_next_byte(io))
 
-read_strem(stream::IO) = String(read_strem_bytes(stream))
-read_strem() = read_strem(in_stream)
+read_stream(stream::IO) = String(read_strem_bytes(stream))
+read_stream() = read_stream(in_stream)
 
 flush(stream::IO, buffer::Base.BufferStream) = Base.write(stream, read_strem(buffer))
 
