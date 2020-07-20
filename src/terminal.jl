@@ -111,17 +111,26 @@ end_keypad_transmit_mode() = end_keypad_transmit_mode(out_stream)
 # | extensions |
 # +------------+
 
-displaysize(height::Int, width::Int; stream=out_stream) = Base.write(stream, "$(CSI)8;$(height);$(width)t")
+displaysize(stream::IO, height::Int, width::Int) = Base.write(stream, "$(CSI)8;$(height);$(width)t")
+displaysize(height::Int, width::Int) = displaysize(out_stream, height, width)
 
-cmove(y::Int, x::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(y);$(x)H")
-cmove_line_last(; stream=out_stream) = Base.write(stream, "$(CSI)$(displaysize()[1]);1H")
+cmove(stream::IO, y::Int, x::Int) = Base.write(stream, "$(CSI)$(y);$(x)H")
+cmove(y::Int, x::Int) = cmove(out_stream, y, x)
 
-clear_line(row::Int; stream=out_stream) = (Base.write(stream, "$(CSI)$(row);1H"); clear_line())
+cmove_line_last(stream::IO) = Base.write(stream, "$(CSI)$(displaysize()[1]);1H")
+cmove_line_last() = cmove_line_last(out_stream)
 
-cshow(enable=true; stream=out_stream) = (enable ? Base.write(stream, "$(CSI)?25h") : Base.write(stream, "$(CSI)?25l"))
+clear_line(stream::IO, row::Int) = (Base.write(stream, "$(CSI)$(row);1H"); clear_line())
+clear_line(row::Int) = clear_line(out_stream, row)
 
-csave(; stream=out_stream) = Base.write(stream, "$(CSI)s")
-crestore(; stream=out_stream) = Base.write(stream, "$(CSI)u")
+cshow(stream::IO, enable=true) = (enable ? Base.write(stream, "$(CSI)?25h") : Base.write(stream, "$(CSI)?25l"))
+cshow(enable=true) = cshow(out_stream, enable)
+
+csave(stream::IO) = Base.write(stream, "$(CSI)s")
+csave() = csave(out_stream)
+
+crestore(stream::IO) = Base.write(stream, "$(CSI)u")
+crestore() = crestore(out_stream)
 
 # +----+
 # | IO |
