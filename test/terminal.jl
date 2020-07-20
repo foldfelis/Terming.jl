@@ -26,6 +26,8 @@
     @test T.read_strem(T.out_stream) == "$(T.CSI)1B\r"
     T.cmove_line_down(5)
     @test T.read_strem(T.out_stream) == "$(T.CSI)5B\r"
+    T.cmove_col()
+    @test T.read_strem(T.out_stream) == "\r"
     T.cmove_col(5)
     @test T.read_strem(T.out_stream) == "\r$(T.CSI)4C"
 
@@ -78,6 +80,8 @@ end
     @test T.read_strem(fake_out_stream) == "$(T.CSI)1B\r"
     T.cmove_line_down(fake_out_stream, 5)
     @test T.read_strem(fake_out_stream) == "$(T.CSI)5B\r"
+    T.cmove_col(fake_out_stream)
+    @test T.read_strem(fake_out_stream) == "\r"
     T.cmove_col(fake_out_stream, 5)
     @test T.read_strem(fake_out_stream) == "\r$(T.CSI)4C"
 
