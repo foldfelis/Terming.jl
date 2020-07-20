@@ -123,35 +123,26 @@ end
 
 @testset "buffered" begin
 
-    T.@buffered begin
-        T.cmove(3, 5)
-        T.print("apple", "orange")
-        T.csave()
+    fake_out_stream = Base.BufferStream()
+
+    function paint(buffer::IO)
+        T.print("buffered string", stream=buffer)
     end
-    @test T.read_strem(stream=out_stream) == "\e[3;5Happleorange\e[s"
 
-    T.@buffered T.cmove(3, 5); T.print("apple", "orange"); T.csave()
-    @test T.read_strem(stream=out_stream) == "\e[3;5Happleorange\e[s"
+    T.buffered(paint, stream=fake_out_stream)
+    @test T.read_strem(stream=fake_out_stream) == "buffered string"
 
-    T.@buffered T.print("apple", "orange")
-    @test T.read_strem(stream=out_stream) == "appleorange"
+    T.buffered(paint)
+    @test T.read_strem(stream=T.out_stream) == "buffered string"
 
-    io = IOBuffer()
-    dummy(i) = i
-    T.@buffered begin
-        for i=1:5
-            the_num = dummy(i)
-            T.print(i)
-        end
-        T.cmove(3, 5)
-        T.print("apple", "orange")
-        Base.print(io, "This don't show")
-        T.csave()
-        for i=1:5
-            T.cmove(3, 5)
-            T.print("apple", "orange")
-            T.csave()
-        end
+    T.buffered() do buffer
+        T.println("buffered string 1", stream=buffer)
+        T.println("buffered string 2", stream=buffer)
+        T.println("buffered string 3", stream=buffer)
     end
-    @test T.read_strem(stream=out_stream) == "12345"*"\e[3;5Happleorange\e[s"^6
+    @test T.read_strem(stream=T.out_stream) ==
+        "buffered string 1\n" *
+        "buffered string 2\n" *
+        "buffered string 3\n"
+
 end

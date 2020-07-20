@@ -1,6 +1,4 @@
 using REPL
-using MacroTools
-M = MacroTools
 
 export # wrapping
     CSI,
@@ -40,9 +38,8 @@ export # utils
     init_term,
     read_strem_bytes,
     read_strem,
-    @buffered,
-    mark_bufferable,
-    flush
+    flush,
+    buffered
 
 export FakeTerminal, fake_input
 
@@ -138,57 +135,12 @@ read_strem(; stream=in_stream) = String(read_strem_bytes(stream=stream))
 
 flush(; stream=out_stream, buffer::Base.BufferStream) = Base.write(stream, read_strem(stream=buffer))
 
-macro buffered(expr::Expr)
-    expr = M.postwalk(
-        x->M.@capture(x, (namespace_.f_|f_)(argv__)) ? _redirect_stream(namespace, f, argv) : x,
-        expr
-    )
+function buffered(f; stream=out_stream)
+    buffer=Base.BufferStream()
+    f(buffer)
+    flush(stream=stream, buffer=buffer)
 
-    expr = quote
-        buffer = Base.BufferStream()
-        $expr
-        Terming.flush(buffer=buffer)
-    end
-
-    return esc(expr)
-end
-
-bufferable = [
-    :displaysize,
-    :cmove_up,
-    :cmove_down,
-    :cmove_left,
-    :cmove_right,
-    :cmove_line_up,
-    :cmove_line_down,
-    :cmove_col,
-    :clear,
-    :clear_line,
-    :enable_bracketed_paste,
-    :disable_bracketed_paste,
-    :end_keypad_transmit_mode,
-    :cmove,
-    :cmove_line_last,
-    :cshow,
-    :csave,
-    :crestore,
-    :write,
-    :print,
-    :println,
-    :join
-]
-
-mark_bufferable(f::Symbol) = push!(bufferable, f)
-
-function _redirect_stream(namespace, f, argv)
-    if f in bufferable
-        (namespace === nothing) && return :($f($(argv...), stream=buffer))
-        (namespace === :Base) && return :($namespace.$f($(argv...)))
-        return :($namespace.$f($(argv...), stream=buffer))
-    end
-
-    (namespace === nothing) && return :($f($(argv...)))
-    return :($namespace.$f($(argv...)))
+    return
 end
 
 # +---------------+
