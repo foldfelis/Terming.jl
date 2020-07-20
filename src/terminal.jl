@@ -133,12 +133,12 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 
 read_strem(; stream=in_stream) = String(read_strem_bytes(stream=stream))
 
-flush(; stream=out_stream, buffer::Base.BufferStream) = Base.write(stream, read_strem(stream=buffer))
+flush(stream::IO, buffer::Base.BufferStream) = Base.write(stream, read_strem(stream=buffer))
 
 function buffered(f; stream=out_stream)
     buffer=Base.BufferStream()
     f(buffer)
-    flush(stream=stream, buffer=buffer)
+    flush(stream, buffer)
 
     return
 end
