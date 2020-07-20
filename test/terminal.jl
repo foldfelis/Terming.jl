@@ -130,7 +130,7 @@ end
         T.print(buffer, "buffered string")
     end
 
-    T.buffered(fake_out_stream, paint)
+    T.buffered(paint, fake_out_stream)
     @test T.read_strem(fake_out_stream) == "buffered string"
 
     # no redirection
@@ -159,5 +159,10 @@ end
         T.print(buffer, "CustomType()")
     end
     @test T.read_strem(T.out_stream) == "CustomType()"
+
+    T.buffered(fake_out_stream, CustomType()) do buffer::IO, ::CustomType
+        T.print(buffer, "CustomType()")
+    end
+    @test T.read_strem(fake_out_stream) == "CustomType()"
 
 end

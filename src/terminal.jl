@@ -184,7 +184,7 @@ read_strem() = read_strem(in_stream)
 
 flush(stream::IO, buffer::Base.BufferStream) = Base.write(stream, read_strem(buffer))
 
-function buffered(stream::IO, f, argv...)
+function buffered(f, stream::IO, argv...)
     buffer=Base.BufferStream()
     f(buffer, argv...)
     flush(stream, buffer)
@@ -192,7 +192,7 @@ function buffered(stream::IO, f, argv...)
     return
 end
 
-buffered(f, argv...) = buffered(out_stream, f, argv...)
+buffered(f, argv...) = buffered(f, out_stream, argv...)
 
 # +---------------+
 # | fake terminal |
