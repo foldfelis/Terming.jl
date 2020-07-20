@@ -136,10 +136,18 @@ crestore() = crestore(out_stream)
 # | IO |
 # +----+
 
-write(args...; stream=out_stream) = Base.write(stream, args...)
-print(args...; stream=out_stream) = Base.print(stream, args...)
-println(args...; stream=out_stream) = Base.println(stream, args...)
-join(args...; stream=out_stream) = Base.join(stream, args...)
+write(stream::IO, args...) = Base.write(stream, args...)
+write(args...) = Base.write(out_stream, args...)
+
+print(stream::IO, args...) = Base.print(stream, args...)
+print(args...) = Base.print(out_stream, args...)
+
+println(stream::IO, args...) = Base.println(stream, args...)
+println(args...) = Base.println(out_stream, args...)
+
+join(stream::IO, args...) = Base.join(stream, args...)
+join(args...) = Base.join(out_stream, args...)
+
 
 # +-------+
 # | utils |
