@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img width="400" src="gallery/logo.png" alt="Terming">
+    <img width="400" src="example/features/logo.png" alt="Terming">
     <br>
 </h1>
 
@@ -141,13 +141,3 @@ main()
 ### **Looking for color screeen?**
 
 It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations.
-
-
-## Usage
-
-Style and colors.
-
-```julia
-```
-
-Moving the cursor
