@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img width="400" src="example/features/logo.png" alt="Terming">
+    <img width="650" src="example/features/logo.png" alt="Terming">
     <br>
 </h1>
 
