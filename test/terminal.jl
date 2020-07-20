@@ -50,6 +50,39 @@
 
 end
 
+@testset "terminal.wrapping redirect stream" begin
+
+    fake_out_stream = Base.BufferStream()
+
+    T.cmove_up(fake_out_stream)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)1A"
+    T.cmove_up(fake_out_stream, 5)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)5A"
+    T.cmove_down(fake_out_stream)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)1B"
+    T.cmove_down(fake_out_stream, 5)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)5B"
+    T.cmove_left(fake_out_stream)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)1D"
+    T.cmove_left(fake_out_stream, 5)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)5D"
+    T.cmove_right(fake_out_stream)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)1C"
+    T.cmove_right(fake_out_stream, 5)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)5C"
+    T.cmove_line_up(fake_out_stream)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)1A\r"
+    T.cmove_line_up(fake_out_stream, 5)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)5A\r"
+    T.cmove_line_down(fake_out_stream)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)1B\r"
+    T.cmove_line_down(fake_out_stream, 5)
+    @test T.read_strem(fake_out_stream) == "$(T.CSI)5B\r"
+    T.cmove_col(fake_out_stream, 5)
+    @test T.read_strem(fake_out_stream) == "\r$(T.CSI)4C"
+
+end
+
 @testset "terminal.extension" begin
 
     T.displaysize(30, 50)
@@ -101,6 +134,34 @@ end
     list = ["a", "b", "c", "d"]
     T.join(list, ", ", " and ")
     @test T.read_strem(T.out_stream) == "a, b, c and d"
+
+end
+
+@testset "io redirect stream" begin
+
+    fake_out_stream = Base.BufferStream()
+
+    T.write(fake_out_stream, "a")
+    @test T.read_strem(fake_out_stream) == "a"
+
+    T.write(fake_out_stream, "a", "a")
+    @test T.read_strem(fake_out_stream) == "aa"
+
+    T.print(fake_out_stream, "a")
+    @test T.read_strem(fake_out_stream) == "a"
+
+    T.print(fake_out_stream, "a", "a")
+    @test T.read_strem(fake_out_stream) == "aa"
+
+    T.println(fake_out_stream, "a")
+    @test T.read_strem(fake_out_stream) == "a\n"
+
+    T.println(fake_out_stream, "a", "a")
+    @test T.read_strem(fake_out_stream) == "aa\n"
+
+    list = ["a", "b", "c", "d"]
+    T.join(fake_out_stream, list, ", ", " and ")
+    @test T.read_strem(fake_out_stream) == "a, b, c and d"
 
 end
 
