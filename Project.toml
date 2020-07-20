@@ -4,7 +4,6 @@ authors = ["JingYu Ning <foldfelis@gmail.com> and contributors"]
 version = "0.2.0"
 
 [deps]
-MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
