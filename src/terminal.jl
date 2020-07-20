@@ -52,29 +52,60 @@ const CSI = REPL.Terminals.CSI
 displaysize(; t=term) = REPL.Terminals.displaysize(t)
 raw!(enable::Bool; t=term) = REPL.Terminals.raw!(t, enable)
 
-cmove_up(n::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(n)A")
-cmove_up(; stream=out_stream) = cmove_up(1, stream=stream)
-cmove_down(n::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(n)B")
-cmove_down(; stream=out_stream) = cmove_down(1, stream=stream)
-cmove_right(n::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(n)C")
-cmove_right(; stream=out_stream) = cmove_right(1, stream=stream)
-cmove_left(n::Int; stream=out_stream) = Base.write(stream, "$(CSI)$(n)D")
-cmove_left(; stream=out_stream) = cmove_left(1, stream=stream)
-cmove_col(n::Int; stream=out_stream) = (Base.write(stream, '\r'); n > 1 && cmove_right(n-1, stream=stream)) # SCI n G
-cmove_col(; stream=out_stream) = cmove_col(1, stream=stream)
-cmove_line_up(n::Int; stream=out_stream) = (cmove_up(n, stream=stream); cmove_col(stream=stream)) # CSI n F
-cmove_line_up(; stream=out_stream) = cmove_line_up(1, stream=stream)
-cmove_line_down(n::Int; stream=out_stream) = (cmove_down(n, stream=stream); cmove_col(stream=stream)) # SCI n E
-cmove_line_down(; stream=out_stream) = cmove_line_down(1, stream=stream)
+cmove_up(stream::IO, n::Int) = Base.write(stream, "$(CSI)$(n)A")
+cmove_up(n::Int) = cmove_up(out_stream, n)
+cmove_up(stream::IO) = cmove_up(stream, 1)
+cmove_up()  = cmove_up(1)
 
-@eval clear(; stream=out_stream) = Base.write(stream, $"$(CSI)H$(CSI)2J")
-@eval clear_line(; stream=out_stream) = Base.write(stream, $"\r$(CSI)0K")
+cmove_down(stream::IO, n::Int) = Base.write(stream, "$(CSI)$(n)B")
+cmove_down(n::Int) = cmove_down(out_stream, n)
+cmove_down(stream::IO) = cmove_down(stream, 1)
+cmove_down() = cmove_down(1)
 
-beep(; stream=err_stream) = Base.write(stream,"\x7")
+cmove_right(stream::IO, n::Int) = Base.write(stream, "$(CSI)$(n)C")
+cmove_right(n::Int) = cmove_right(out_stream, n)
+cmove_right(stream::IO) = cmove_right(stream, 1)
+cmove_right() = cmove_right(1)
 
-@eval enable_bracketed_paste(; stream=out_stream) = Base.write(stream, $"$(CSI)?2004h")
-@eval disable_bracketed_paste(; stream=out_stream) = Base.write(stream, $"$(CSI)?2004l")
-@eval end_keypad_transmit_mode(; stream=out_stream) = Base.write(stream, $"$(CSI)?1l\x1b>")
+cmove_left(stream::IO, n::Int) = Base.write(stream, "$(CSI)$(n)D")
+cmove_left(n::Int) = cmove_left(out_stream, n)
+cmove_left(stream::IO) = cmove_left(stream, 1)
+cmove_left() = cmove_left(1)
+
+cmove_col(stream::IO, n::Int) = (Base.write(stream, '\r'); n > 1 && cmove_right(stream, n-1)) # SCI n G
+cmove_col(n::Int) = cmove_col(out_stream, n)
+cmove_col(stream::IO) = cmove_col(stream, 1)
+cmove_col() = cmove_col(1)
+
+cmove_line_up(stream::IO, n::Int) = (cmove_up(stream, n); cmove_col(stream)) # CSI n F
+cmove_line_up(n::Int) = cmove_line_up(out_stream, n)
+cmove_line_up(stream::IO) = cmove_line_up(stream, 1)
+cmove_line_up() = cmove_line_up(1)
+
+cmove_line_down(stream::IO, n::Int) = (cmove_down(stream, n); cmove_col(stream)) # SCI n E
+cmove_line_down(n::Int) = cmove_line_down(out_stream, n)
+cmove_line_down(stream::IO) = cmove_line_down(stream, 1)
+cmove_line_down() = cmove_line_down(1)
+
+
+@eval clear(stream::IO) = Base.write(stream, $"$(CSI)H$(CSI)2J")
+clear() = clear(out_stream)
+
+@eval clear_line(stream::IO) = Base.write(stream, $"\r$(CSI)0K")
+clear_line() = clear_line(out_stream)
+
+beep(stream::IO) = Base.write(stream,"\x7")
+beep() = beep(err_stream)
+
+@eval enable_bracketed_paste(stream::IO) = Base.write(stream, $"$(CSI)?2004h")
+enable_bracketed_paste() = enable_bracketed_paste(out_stream)
+
+@eval disable_bracketed_paste(stream::IO) = Base.write(stream, $"$(CSI)?2004l")
+disable_bracketed_paste() = disable_bracketed_paste(out_stream)
+
+@eval end_keypad_transmit_mode(stream::IO) = Base.write(stream, $"$(CSI)?1l\x1b>")
+end_keypad_transmit_mode() = end_keypad_transmit_mode(out_stream)
+
 
 # +------------+
 # | extensions |
@@ -134,7 +165,7 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 read_strem(stream) = String(read_strem_bytes(stream))
 read_strem() = read_strem(in_stream)
 
-flush(stream::IO, buffer::Base.BufferStream) = Base.write(stream, read_strem(stream=buffer))
+flush(stream::IO, buffer::Base.BufferStream) = Base.write(stream, read_strem(buffer))
 
 function buffered(f, argv...; stream=out_stream)
     buffer=Base.BufferStream()
