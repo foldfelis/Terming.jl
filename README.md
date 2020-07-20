@@ -140,4 +140,4 @@ main()
 
 ### **Looking for color screeen?**
 
-It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations.
+It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations. Here is an [example](example/features/logo.jl)
