@@ -121,37 +121,43 @@ end
 
 end
 
-# @testset "buffered" begin
+@testset "buffered" begin
 
-#     # redirect out_stream to a larger buffer
-#     fake_out_stream = Base.BufferStream()
+    # redirect out_stream to a larger buffer
+    fake_out_stream = Base.BufferStream()
 
-#     function paint(buffer::IO)
-#         T.print("buffered string", stream=buffer)
-#     end
+    function paint(buffer::IO)
+        T.print(buffer, "buffered string")
+    end
 
-#     T.buffered(paint, stream=fake_out_stream)
-#     @test T.read_strem(stream=fake_out_stream) == "buffered string"
+    T.buffered(fake_out_stream, paint)
+    @test T.read_strem(fake_out_stream) == "buffered string"
 
-#     # no redirection
-#     T.buffered(paint)
-#     @test T.read_strem(stream=T.out_stream) == "buffered string"
+    # no redirection
+    T.buffered(paint)
+    @test T.read_strem(T.out_stream) == "buffered string"
 
-#     # do expr
-#     T.buffered() do buffer
-#         T.println("buffered string 1", stream=buffer)
-#         T.println("buffered string 2", stream=buffer)
-#         T.println("buffered string 3", stream=buffer)
-#     end
-#     @test T.read_strem(stream=T.out_stream) ==
-#         "buffered string 1\n" *
-#         "buffered string 2\n" *
-#         "buffered string 3\n"
+    # do expr
+    T.buffered() do buffer
+        T.println(buffer, "buffered string 1")
+        T.println(buffer, "buffered string 2")
+        T.println(buffer, "buffered string 3")
+    end
+    @test T.read_strem(T.out_stream) ==
+        "buffered string 1\n" *
+        "buffered string 2\n" *
+        "buffered string 3\n"
 
-#     # # with extra argv
-#     # struct CustomType end
+    # with extra argv
+    struct CustomType end
 
-#     # render(stream::IO, ::CustomType) = T.print()
+    render(stream::IO, ::CustomType) = T.print(stream, "CustomType()")
+    T.buffered(render, CustomType())
+    @test T.read_strem(T.out_stream) == "CustomType()"
 
+    T.buffered(CustomType()) do buffer::IO, ::CustomType
+        T.print(buffer, "CustomType()")
+    end
+    @test T.read_strem(T.out_stream) == "CustomType()"
 
-# end
+end
