@@ -5,7 +5,7 @@ end
 function InputListener(size=Inf)
     sequence_queue = Channel{String}(size, spawn=true) do ch
         while true
-            sequence = T.read_strem()
+            sequence = T.read_stream()
             put!(ch, sequence)
         end
     end

@@ -162,7 +162,7 @@ end
 
 read_next_byte(io::IO) = read(io, 1)[1]
 
-function read_strem_bytes(stream::IO)
+function read_stream_bytes(stream::IO)
     queue = UInt8[]
 
     push!(queue, read_next_byte(stream))
@@ -179,7 +179,7 @@ end
 
 read_next_char(io::IO) = Char(read_next_byte(io))
 
-read_stream(stream::IO) = String(read_strem_bytes(stream))
+read_stream(stream::IO) = String(read_stream_bytes(stream))
 read_stream() = read_stream(in_stream)
 
 flush(stream::IO, buffer::Base.BufferStream) = Base.write(stream, read_stream(buffer))
