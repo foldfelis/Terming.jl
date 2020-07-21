@@ -1,7 +1,6 @@
 include("listener.jl")
 
 struct QuitEvent <: T.Event end
-
 Base.show(io::IO, ::QuitEvent) = Base.print(io, "QuitEvent")
 
 struct App
