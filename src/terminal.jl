@@ -87,7 +87,6 @@ cmove_line_down(n::Int) = cmove_line_down(out_stream, n)
 cmove_line_down(stream::IO) = cmove_line_down(stream, 1)
 cmove_line_down() = cmove_line_down(1)
 
-
 @eval clear(stream::IO) = Base.write(stream, $"$(CSI)H$(CSI)2J")
 clear() = clear(out_stream)
 
@@ -105,7 +104,6 @@ disable_bracketed_paste() = disable_bracketed_paste(out_stream)
 
 @eval end_keypad_transmit_mode(stream::IO) = Base.write(stream, $"$(CSI)?1l\x1b>")
 end_keypad_transmit_mode() = end_keypad_transmit_mode(out_stream)
-
 
 # +------------+
 # | extensions |
@@ -147,7 +145,6 @@ println(args...) = Base.println(out_stream, args...)
 
 join(stream::IO, args...) = Base.join(stream, args...)
 join(args...) = Base.join(out_stream, args...)
-
 
 # +-------+
 # | utils |
