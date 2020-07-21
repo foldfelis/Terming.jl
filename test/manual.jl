@@ -11,7 +11,7 @@ get_event_queue(app::App) = app.pipeline[end]
 function init_pipeline(size=Inf)
     sequence_queue = Channel{String}(size, spawn=true) do ch
         while true
-            sequence = T.read_strem()
+            sequence = T.read_stream()
             put!(ch, sequence)
         end
     end
