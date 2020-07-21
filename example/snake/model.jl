@@ -58,7 +58,7 @@ function move(snake_model::SnakeModel, direction::Symbol)
 
     put!(snake_model.global_event_queue, UpdateEvent())
 
-    return  true
+    return true
 end
 
 function auto_move(snake_model::SnakeModel)
