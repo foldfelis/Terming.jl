@@ -12,7 +12,7 @@ struct FormView <: View
     components::Vector{View}
 end
 
-function paint(form_view::FormView)
+function paint(form_view::FormView; state=:normal)
     h, w = form_view.size
 
     T.buffered() do buffer
@@ -33,7 +33,18 @@ function paint(form_view::FormView)
         T.print(buffer, Char(0x2514)) # └
         T.print(buffer, Char(0x2500)^(w-2))
         T.print(buffer, Char(0x2518)) # ┘
+
+        T.cmove(buffer, 1, 2)
+        T.print(buffer, " Snake Game ")
+
         T.print(buffer, RES_C)
+    end
+
+    if state === :lose
+        str = "You Lose ~~"
+        T.cmove(trunc(Int, h/2), trunc(Int, (w-textwidth(str))/2))
+        T.print(str)
+        return
     end
 
     for component in form_view.components

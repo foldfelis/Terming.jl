@@ -1,4 +1,23 @@
-include("listener.jl")
+struct InputListener
+    pipeline::Vector{Channel}
+end
+
+function InputListener(size=Inf)
+    sequence_queue = Channel{String}(size, spawn=true) do ch
+        while true
+            sequence = T.read_stream()
+            put!(ch, sequence)
+        end
+    end
+    event_queue = Channel{T.Event}(size, spawn=true) do ch
+        while true
+            sequence = take!(sequence_queue)
+            put!(ch, T.parse_sequence(sequence))
+        end
+    end
+
+    return InputListener([sequence_queue, event_queue])
+end
 
 struct QuitEvent <: T.Event end
 Base.show(io::IO, ::QuitEvent) = Base.print(io, "QuitEvent")
@@ -15,7 +34,7 @@ event_queue(app::App) = app.listener.pipeline[end]
 function init_term(app::App)
     run(`clear`)
     h, w = app.size
-    T.displaysize(h, w)
+    T.displaysize(h+3, w)
     T.cshow(false)
     T.raw!(true)
 end
@@ -31,7 +50,7 @@ emit_quit_event(app::App) = put!(event_queue(app), QuitEvent())
 
 function handle_lose(app::App)
     T.cmove_line_last()
-    T.println("\nYou Lose")
+    paint(app.view, state=:lose)
     emit_quit_event(app)
 end
 
@@ -40,7 +59,8 @@ function handle_quit(app::App)
     foreach(close, app.listener.pipeline)
 
     T.cmove_line_last()
-    T.println("\nShutted down...")
+    T.cmove_up(2)
+    T.println("Shutted down...")
 
     return keep_running
 end
