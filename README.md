@@ -17,11 +17,11 @@
 
 # Terming.jl
 
-Terming is a toolbox for manipulate terminals written in pure Julia. It offeres some low level yet elegent APIs to handle information directly from and work around with TTYs.
+Terming is a toolbox for manipulate terminals written in pure Julia. It offers low-level and elegant APIs to handle information directly from and work around with TTYs.
 
-Owing to maintain its simplicity, Terming provides only high coverage of essential ANSI terminal methods that allows developers to focus on their features without getting hands dirty communicate with terminals. In short, Terming handels like a dream.
+To its simplicity, Terming provides high coverage of essential ANSI terminal methods that allows developers to focus on their features without bother communicating with terminals. In short, Terming handles like a dream.
 
-For something more high-level, please check out [DisplayStructure.jl](https://github.com/foldfelis/DisplayStructure.jl), which uses Terming as backend.
+For more high-level functionality, please check out [DisplayStructure.jl](https://github.com/foldfelis/DisplayStructure.jl), which uses Terming as backend.
 
 ## Quick start
 
@@ -138,6 +138,6 @@ main()
 
 ![](example/features/buffered2.png)
 
-### **Looking for color screeen?**
+### **Looking for color screen?**
 
 It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations. Here is an [example](example/features/logo.jl)
