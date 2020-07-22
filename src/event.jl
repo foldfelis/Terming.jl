@@ -1,8 +1,8 @@
-export SpetialKeys, CtlKey
+export SpecialKeys, CtlKey
 export Event, KeyPressedEvent, PasteEvent
 export match
 
-@enum SpetialKeys begin
+@enum SpecialKeys begin
     # Function Keys match range 0:11
     F1
     F2
@@ -53,11 +53,11 @@ end
 abstract type Event end
 
 struct KeyPressedEvent <: Event
-    key::Union{Char, SpetialKeys}
+    key::Union{Char, SpecialKeys}
     ctl::CtlKey
 end
 
-KeyPressedEvent(key::Union{Char, SpetialKeys}) = KeyPressedEvent(key, NO_CTL)
+KeyPressedEvent(key::Union{Char, SpecialKeys}) = KeyPressedEvent(key, NO_CTL)
 
 function Base.show(io::IO, e::KeyPressedEvent)
     ctl = (e.ctl === NO_CTL) ? "" : "$(string.(e.ctl))+"

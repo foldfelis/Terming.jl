@@ -60,7 +60,7 @@ function parse_xterm_f1_2_f4(sequence::String, state::Int)
 
     (c, state) = next
     if any(isequal(c), 'P':'S')
-        return KeyPressedEvent(SpetialKeys(UInt8(c)-UInt8('P')))
+        return KeyPressedEvent(SpecialKeys(UInt8(c)-UInt8('P')))
     end
 
     return PasteEvent(sequence) # fallback
@@ -132,17 +132,17 @@ end
 function parse_vt_code(sequence::String, code::Int; ctls=NO_CTL)
     if code in 1:6 # HOME INSERT DELETE END PAGEUP PAGEDOWN
         enum_bias = 11
-        return KeyPressedEvent(SpetialKeys(code+enum_bias), ctls)
+        return KeyPressedEvent(SpecialKeys(code+enum_bias), ctls)
     elseif code == 7 # HOME
         return KeyPressedEvent(HOME, ctls)
     elseif code == 8 # END
         return KeyPressedEvent(END, ctls)
     elseif code in 11:15 # F1 - F5
-        return KeyPressedEvent(SpetialKeys(code-11), ctls)
+        return KeyPressedEvent(SpecialKeys(code-11), ctls)
     elseif code in 17:21 # F6 - f10
-        return KeyPressedEvent(SpetialKeys(code-12), ctls)
+        return KeyPressedEvent(SpecialKeys(code-12), ctls)
     elseif code in 23:24 # F11 - F12
-        return KeyPressedEvent(SpetialKeys(code-13), ctls)
+        return KeyPressedEvent(SpecialKeys(code-13), ctls)
     end
 
     return PasteEvent(sequence) # fallback
@@ -150,7 +150,7 @@ end
 
 function parse_xterm_code(sequence::String, code::Int; ctls=NO_CTL)
     if code in Int('A'):Int('D') || code == Int('Z') # UP DOWN RIGHT LEFT BACKTAB
-        return KeyPressedEvent(SpetialKeys(code), ctls)
+        return KeyPressedEvent(SpecialKeys(code), ctls)
     elseif code == Int('F') # END
         return KeyPressedEvent(END, ctls)
     elseif code == Int('G') # Keypad 5
@@ -158,7 +158,7 @@ function parse_xterm_code(sequence::String, code::Int; ctls=NO_CTL)
     elseif code == Int('H') # HOME
         return KeyPressedEvent(HOME, ctls)
     elseif code in 0:3 # F1 - F4 with ctl keys have the same form
-        return KeyPressedEvent(SpetialKeys(code), ctls)
+        return KeyPressedEvent(SpecialKeys(code), ctls)
     end
 
     return PasteEvent(sequence) # fallback
