@@ -39,7 +39,7 @@ end
 
 function reset_term(::App)
     T.raw!(false)
-    T.println("Press ENTER to quit"); readline()
+    sleep(1)
     T.alt_screen(false); T.cshow()
 
     return
