@@ -179,10 +179,10 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 read_stream(stream::IO) = String(read_stream_bytes(stream))
 read_stream() = read_stream(in_stream)
 
-flush(stream::IO, buffer::Base.BufferStream) = Base.write(stream, read_stream(buffer))
+flush(stream::IO, buffer::IOBuffer) = Base.write(stream, take!(buffer))
 
 function buffered(f, stream::IO, argv...)
-    buffer=Base.BufferStream()
+    buffer=IOBuffer()
     f(buffer, argv...)
     flush(stream, buffer)
 
