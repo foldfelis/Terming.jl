@@ -45,9 +45,9 @@ export
     FakeTerminal,
     fake_input
 
-# +---------------------------+
+# +----------------------------+
 # | wrapping of REPL.Terminals |
-# +---------------------------+
+# +----------------------------+
 
 const CSI = REPL.Terminals.CSI
 
