@@ -6,7 +6,7 @@ const T = Terming
 
 @testset "manual" begin
 
-    manual_debug_mode = false
+    manual_debug_mode = true
     (manual_debug_mode) && include("manual.jl")
 
 end

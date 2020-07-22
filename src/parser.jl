@@ -15,29 +15,29 @@ end
 
 function parse_single_char_sequence(sequence::Char; is_alt=false)
     if is_alt
-        ctl = ALT
-        ctrl_ctl = CTRL_ALT
+        adjoint_keys = ALT
+        adjoint_ctrl = CTRL_ALT
     else
-        ctl = NO_CTL
-        ctrl_ctl = CTRL
+        adjoint_keys = NO_CTL
+        adjoint_ctrl = CTRL
     end
 
     if sequence == '\n' || sequence == '\r' # ENTER
-        return KeyPressedEvent(ENTER, ctl)
+        return KeyPressedEvent(ENTER, adjoint_keys)
     elseif sequence == '\e' # ESC
-        return KeyPressedEvent(ESC, ctl)
+        return KeyPressedEvent(ESC, adjoint_keys)
     elseif sequence == '\t' # TAB
-        return KeyPressedEvent(TAB, ctl)
+        return KeyPressedEvent(TAB, adjoint_keys)
     elseif sequence == '\x7F' #BACKSPACE
-        return KeyPressedEvent(BACKSPACE, ctl)
+        return KeyPressedEvent(BACKSPACE, adjoint_keys)
     elseif sequence == '\0' # NULL
-        return KeyPressedEvent(NULL, ctl)
+        return KeyPressedEvent(NULL, adjoint_keys)
     elseif any(isequal(sequence), Char(0x01):Char(0x1A)) # CTRL + key
-        return KeyPressedEvent(Char(UInt8(sequence)-0x01+UInt8('a')), ctrl_ctl)
+        return KeyPressedEvent(Char(UInt8(sequence)-0x01+UInt8('a')), adjoint_ctrl)
     elseif any(isequal(sequence), Char(0x0C):Char(0x1F)) # CTRL + key
-        return KeyPressedEvent(Char(UInt8(sequence)-0x1C+UInt8('4')), ctrl_ctl)
+        return KeyPressedEvent(Char(UInt8(sequence)-0x1C+UInt8('4')), adjoint_ctrl)
     else # single char
-        return KeyPressedEvent(sequence, ctl)
+        return KeyPressedEvent(sequence, adjoint_keys)
     end
 end
 
@@ -72,15 +72,15 @@ function parse_csi(sequence::String, state::Int)
 
     if sequence[end] == '~' # vt sequence
         code_sequence = sequence[state:(end-1)]
-        if ';' in code_sequence # with ctl keys
+        if ';' in code_sequence # with adjoint keys
             # +------------------------------------------------------------------+
             # | the form of the sequence: "\e[<code>;<ctls_code>~" and code=1:35 |
             # +------------------------------------------------------------------+
             code, ctls_code = tryparse.(Int, split(code_sequence, ';'))
             (code === nothing || ctls_code === nothing) && (return PasteEvent(sequence))  # fallback
-            ctls = parse_ctl_code(ctls_code)
+            ctls = parse_adjoint_keys_code(ctls_code)
             (ctls == -1) && (return PasteEvent(sequence))  # fallback
-        else # without ctl keys
+        else # without adjoint keys
             # +------------------------------------------------------+
             # | the form of the sequence: "\e[<code>~" and code=1:35 |
             # +------------------------------------------------------+
@@ -92,7 +92,7 @@ function parse_csi(sequence::String, state::Int)
         return parse_vt_code(sequence, code, ctls=ctls)
     else # xterm sequence
         code_sequence = sequence[state:end]
-        if ';' in code_sequence # with ctl keys
+        if ';' in code_sequence # with adjoint keys
             # +-----------------------------------------------------------------+
             # | the form of the sequence: "\e[1;<ctls_code><code>" and code=A:Z |
             # +-----------------------------------------------------------------+
@@ -101,18 +101,18 @@ function parse_csi(sequence::String, state::Int)
 
             # determing key code
             c = code_sequence[2]
-            if any(isequal(c), 'P':'S') # F1 - F4 with ctl keys have the same form
+            if any(isequal(c), 'P':'S') # F1 - F4 with adjoint keys have the same form
                 code = Int(c)-Int('P') # code=1:3, matches the enum F1 - F4
             else
                 code = Int(c)
             end
 
-            # construct CtlKey array
+            # construct AdjointKeys array
             ctls_code = tryparse(Int, string(code_sequence[1]))
             (ctls_code === nothing) && (return PasteEvent(sequence)) # fallback
-            ctls = parse_ctl_code(ctls_code)
+            ctls = parse_adjoint_keys_code(ctls_code)
             (ctls == -1) && (return PasteEvent(sequence))  # fallback
-        else # without ctl keys (not including F1 - F4)
+        else # without adjoint keys (not including F1 - F4)
             # +----------------------------------------------------+
             # | the form of the sequence: "\e[<code>" and code=A:Z |
             # +----------------------------------------------------+
@@ -121,7 +121,7 @@ function parse_csi(sequence::String, state::Int)
             # determing key code
             code = Int(code_sequence[1])
 
-            # construct CtlKey
+            # construct AdjointKeys
             ctls = NO_CTL
         end
 
@@ -157,16 +157,16 @@ function parse_xterm_code(sequence::String, code::Int; ctls=NO_CTL)
         return KeyPressedEvent('5', ctls)
     elseif code == Int('H') # HOME
         return KeyPressedEvent(HOME, ctls)
-    elseif code in 0:3 # F1 - F4 with ctl keys have the same form
+    elseif code in 0:3 # F1 - F4 with adjoint keys have the same form
         return KeyPressedEvent(SpecialKeys(code), ctls)
     end
 
     return PasteEvent(sequence) # fallback
 end
 
-function parse_ctl_code(code::Int)
+function parse_adjoint_keys_code(code::Int)
     if  code in 2:8
-        return CtlKey(code)
+        return AdjointKeys(code)
     end
 
     return -1 # fallback

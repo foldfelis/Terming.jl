@@ -167,7 +167,7 @@
                     @test T.parse_sequence("\e[35$(ctls_str)~") === T.PasteEvent("\e[35$(ctls_str)~")
                 end
 
-                @testset "with CtlKeys" begin
+                @testset "with AdjointKeys" begin
 
                     # +------------------------------------------------------------------+
                     # | the form of the sequence: "\e[<code>;<ctls_code>~" and code=1:35 |
@@ -178,7 +178,7 @@
 
                 end
 
-                @testset "without CtlKeys" begin
+                @testset "without AdjointKeys" begin
 
                     # +------------------------------------------------------+
                     # | the form of the sequence: "\e[<code>~" and code=1:35 |
@@ -250,7 +250,7 @@
                     @test T.parse_sequence("\e[$(ctls_str)Z") === T.KeyPressedEvent(T.BACKTAB, ctls)
                 end
 
-                @testset "with CtlKeys" begin
+                @testset "with AdjointKeys" begin
 
                     # +-----------------------------------------------------------------+
                     # | the form of the sequence: "\e[1;<ctls_code><code>" and code=A:Z |
@@ -261,7 +261,7 @@
 
                 end
 
-                @testset "without CtlKeys" begin
+                @testset "without AdjointKeys" begin
 
                     # +----------------------------------------------------+
                     # | the form of the sequence: "\e[<code>" and code=A:Z |
