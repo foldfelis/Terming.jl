@@ -1,6 +1,7 @@
 using REPL
 
-export # wrapping
+export
+    # wrapping
     CSI,
     displaysize,
     raw!,
@@ -16,35 +17,36 @@ export # wrapping
     beep,
     enable_bracketed_paste,
     disable_bracketed_paste,
-    end_keypad_transmit_mode
+    end_keypad_transmit_mode,
 
-export # extensions
+    # extensions
     displaysize,
     cmove,
     clear_line,
     cmove_line_last,
     cshow,
     csave,
-    crestore
+    crestore,
 
-export # io
+    # io
     write,
     print,
     println,
-    join
+    join,
 
-export # utils
+    # utils
     read_next_char,
     init_term,
     read_stream_bytes,
     read_stream,
     flush,
-    buffered
+    buffered,
 
-export FakeTerminal, fake_input
+    FakeTerminal,
+    fake_input
 
 # +---------------------------+
-# | wrpping of REPL.Terminals |
+# | wrapping of REPL.Terminals |
 # +---------------------------+
 
 const CSI = REPL.Terminals.CSI
