@@ -27,6 +27,7 @@ export
     cshow,
     csave,
     crestore,
+    alt_screen,
 
     # io
     write,
