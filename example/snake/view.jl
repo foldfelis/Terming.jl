@@ -1,4 +1,5 @@
 using Crayons
+Crayons.force_color(true)
 
 const FORM_C = string(Crayon(foreground = :light_blue))
 const HEAD_C = string(Crayon(foreground = :light_yellow))

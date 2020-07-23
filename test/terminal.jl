@@ -113,6 +113,12 @@ end
     T.crestore()
     @test T.read_stream(T.out_stream) == "$(T.CSI)u"
 
+    T.alt_screen(true)
+    @test T.read_stream(T.out_stream) == "$(T.CSI)?1049h"
+
+    T.alt_screen(false)
+    @test T.read_stream(T.out_stream) == "$(T.CSI)?1049l"
+
 end
 
 @testset "io" begin

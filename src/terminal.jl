@@ -27,6 +27,7 @@ export
     cshow,
     csave,
     crestore,
+    alt_screen,
 
     # io
     write,
@@ -49,7 +50,8 @@ export
 const CSI = REPL.Terminals.CSI
 
 displaysize(t=term) = REPL.Terminals.displaysize(t)
-raw!(enable::Bool, t=term) = REPL.Terminals.raw!(t, enable)
+raw!(t::REPL.Terminals.UnixTerminal, enable::Bool) = REPL.Terminals.raw!(t, enable)
+raw!(enable::Bool) = raw!(term, enable)
 
 cmove_up(stream::IO, n::Int) = Base.write(stream, "$(CSI)$(n)A")
 cmove_up(n::Int) = cmove_up(out_stream, n)
@@ -128,6 +130,9 @@ csave() = csave(out_stream)
 
 crestore(stream::IO) = Base.write(stream, "$(CSI)u")
 crestore() = crestore(out_stream)
+
+alt_screen(stream::IO, enable::Bool) = (enable ? Base.write(stream, "$(CSI)?1049h") : Base.write(stream, "$(CSI)?1049l"))
+alt_screen(enable::Bool) = alt_screen(out_stream, enable)
 
 # +----+
 # | IO |
