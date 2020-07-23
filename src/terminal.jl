@@ -27,6 +27,7 @@ export
     cshow,
     csave,
     crestore,
+    alt_screen,
 
     # io
     write,
@@ -128,6 +129,9 @@ csave() = csave(out_stream)
 
 crestore(stream::IO) = Base.write(stream, "$(CSI)u")
 crestore() = crestore(out_stream)
+
+alt_screen(stream::IO, enable::Bool) = (enable ? Base.write(stream, "$(CSI)?1049h") : Base.write(stream, "$(CSI)?1049l"))
+alt_screen(enable::Bool) = alt_screen(out_stream, enable)
 
 # +----+
 # | IO |

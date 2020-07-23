@@ -32,16 +32,15 @@ end
 event_queue(app::App) = app.listener.pipeline[end]
 
 function init_term(app::App)
-    run(`clear`)
-    h, w = app.size
-    T.displaysize(h+3, w)
-    T.cshow(false)
+    T.cshow(false); T.alt_screen(true)
+    h, w = app.size; T.displaysize(h+3, w)
     T.raw!(true)
 end
 
 function reset_term(::App)
     T.raw!(false)
-    T.cshow()
+    sleep(1)
+    T.alt_screen(false); T.cshow()
 
     return
 end
