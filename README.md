@@ -145,3 +145,7 @@ It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to
 ## Want something more advanced?
 
 For a more complete example, take a look at [Snake Game](example/snake).
+
+## State of supporting Windows
+
+Currently, Terming.jl is work in progress, and **partially** supports Windows.
