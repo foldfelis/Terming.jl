@@ -50,7 +50,8 @@ export
 const CSI = REPL.Terminals.CSI
 
 displaysize(t=term) = REPL.Terminals.displaysize(t)
-raw!(enable::Bool, t=term) = REPL.Terminals.raw!(t, enable)
+raw!(t::REPL.Terminals.UnixTerminal, enable::Bool) = REPL.Terminals.raw!(t, enable)
+raw!(enable::Bool) = raw!(term, enable)
 
 cmove_up(stream::IO, n::Int) = Base.write(stream, "$(CSI)$(n)A")
 cmove_up(n::Int) = cmove_up(out_stream, n)
