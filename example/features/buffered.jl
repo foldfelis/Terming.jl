@@ -14,7 +14,7 @@ function main()
     sleep(1) # fake time consuming calculation
     Terming.println(" done!!")
 
-    # move cursor to the begining of next two line; move to col=2
+    # move cursor to the beginning of next two line; move to col=2
     Terming.cmove_line_down(2); Terming.cmove_col(2)
 
     # +-------------+

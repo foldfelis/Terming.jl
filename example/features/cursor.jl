@@ -13,9 +13,9 @@ function main()
     # move cursor down
     Terming.cmove_down()
     Terming.print("This string is printed at next line, with same col")
-    # move cursor to the begining of next line
+    # move cursor to the beginning of next line
     Terming.cmove_line_down()
-    Terming.print("This string is printed at the begining of next line")
+    Terming.print("This string is printed at the beginning of next line")
     # move cursor to last line
     Terming.cmove_line_last()
 

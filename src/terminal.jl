@@ -1,6 +1,7 @@
 using REPL
 
-export # wrapping
+export
+    # wrapping
     CSI,
     displaysize,
     raw!,
@@ -16,24 +17,24 @@ export # wrapping
     beep,
     enable_bracketed_paste,
     disable_bracketed_paste,
-    end_keypad_transmit_mode
+    end_keypad_transmit_mode,
 
-export # extensions
+    # extensions
     displaysize,
     cmove,
     clear_line,
     cmove_line_last,
     cshow,
     csave,
-    crestore
+    crestore,
 
-export # io
+    # io
     write,
     print,
     println,
-    join
+    join,
 
-export # utils
+    # utils
     read_next_char,
     init_term,
     read_stream_bytes,
@@ -41,16 +42,14 @@ export # utils
     flush,
     buffered
 
-export FakeTerminal, fake_input
-
-# +---------------------------+
-# | wrpping of REPL.Terminals |
-# +---------------------------+
+# +----------------------------+
+# | wrapping of REPL.Terminals |
+# +----------------------------+
 
 const CSI = REPL.Terminals.CSI
 
-displaysize(; t=term) = REPL.Terminals.displaysize(t)
-raw!(enable::Bool; t=term) = REPL.Terminals.raw!(t, enable)
+displaysize(t=term) = REPL.Terminals.displaysize(t)
+raw!(enable::Bool, t=term) = REPL.Terminals.raw!(t, enable)
 
 cmove_up(stream::IO, n::Int) = Base.write(stream, "$(CSI)$(n)A")
 cmove_up(n::Int) = cmove_up(out_stream, n)
@@ -150,7 +149,7 @@ join(args...) = Base.join(out_stream, args...)
 # | utils |
 # +-------+
 
-function init_term(; in_stream=stdin, out_stream=stdout, err_stream=stderr)
+function init_term(in_stream=stdin, out_stream=stdout, err_stream=stderr)
     return REPL.Terminals.TTYTerminal(
         get(ENV, "TERM", Sys.iswindows() ? "" : "dumb"),
         in_stream, out_stream, err_stream
@@ -179,10 +178,10 @@ read_next_char(io::IO) = Char(read_next_byte(io))
 read_stream(stream::IO) = String(read_stream_bytes(stream))
 read_stream() = read_stream(in_stream)
 
-flush(stream::IO, buffer::Base.BufferStream) = Base.write(stream, read_stream(buffer))
+flush(stream::IO, buffer::IOBuffer) = Base.write(stream, take!(buffer))
 
 function buffered(f, stream::IO, argv...)
-    buffer=Base.BufferStream()
+    buffer=IOBuffer()
     f(buffer, argv...)
     flush(stream, buffer)
 
@@ -190,27 +189,3 @@ function buffered(f, stream::IO, argv...)
 end
 
 buffered(f, argv...) = buffered(f, out_stream, argv...)
-
-# +---------------+
-# | fake terminal |
-# +---------------+
-
-mutable struct FakeTerminal <: REPL.Terminals.UnixTerminal
-    term_type::String
-    in_stream::Base.IO
-    out_stream::Base.IO
-    err_stream::Base.IO
-    raw::Bool
-end
-
-FakeTerminal(in::Base.IO, out::Base.IO, err::Base.IO) = FakeTerminal(
-    get(ENV, "TERM", Sys.iswindows() ? "" : "dumb"),
-    in, out, err,
-    false
-)
-
-REPL.Terminals.raw!(t::FakeTerminal, raw::Bool) = (t.raw = raw)
-
-REPL.Terminals.displaysize(::FakeTerminal) = (24, 80)
-
-fake_input(key::String; t=term) = Base.print(t.in_stream, key)

@@ -52,9 +52,9 @@ function main()
     # move cursor down
     Terming.cmove_down()
     Terming.print("This string is printed at next line, with same col")
-    # move cursor to the begining of next line
+    # move cursor to the beginning of next line
     Terming.cmove_line_down()
-    Terming.print("This string is printed at the begining of next line")
+    Terming.print("This string is printed at the beginning of next line")
     # move cursor to last line
     Terming.cmove_line_last()
 
@@ -115,7 +115,7 @@ function main()
     sleep(1) # fake time consuming calculation
     Terming.println(" done!!")
 
-    # move cursor to the begining of next two line; move to col=2
+    # move cursor to the beginning of next two line; move to col=2
     Terming.cmove_line_down(2); Terming.cmove_col(2)
 
     # +-------------+
@@ -145,3 +145,7 @@ It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to
 ## Want something more advanced?
 
 For a more complete example, take a look at [Snake Game](example/snake).
+
+## State of supporting Windows
+
+Currently, Terming.jl is work in progress, and **partially** supports Windows.
