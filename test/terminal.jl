@@ -173,13 +173,13 @@ end
 
     T.raw!(true)
 
-    fake_input("k")
+    pseudo_input("k")
     @test T.read_stream() == "k"
 
-    fake_input("\t")
+    pseudo_input("\t")
     @test T.read_stream() == "\t"
 
-    fake_input("$(T.CSI)Z")
+    pseudo_input("$(T.CSI)Z")
     @test T.read_stream() == "\e[Z"
 
     T.raw!(false)

@@ -40,10 +40,7 @@ export
     read_stream_bytes,
     read_stream,
     flush,
-    buffered,
-
-    FakeTerminal,
-    fake_input
+    buffered
 
 # +----------------------------+
 # | wrapping of REPL.Terminals |
@@ -192,27 +189,3 @@ function buffered(f, stream::IO, argv...)
 end
 
 buffered(f, argv...) = buffered(f, out_stream, argv...)
-
-# +---------------+
-# | fake terminal |
-# +---------------+
-
-mutable struct FakeTerminal <: REPL.Terminals.UnixTerminal
-    term_type::String
-    in_stream::Base.IO
-    out_stream::Base.IO
-    err_stream::Base.IO
-    raw::Bool
-end
-
-FakeTerminal(in::Base.IO, out::Base.IO, err::Base.IO) = FakeTerminal(
-    get(ENV, "TERM", Sys.iswindows() ? "" : "dumb"),
-    in, out, err,
-    false
-)
-
-REPL.Terminals.raw!(t::FakeTerminal, raw::Bool) = (t.raw = raw)
-
-REPL.Terminals.displaysize(::FakeTerminal) = (24, 80)
-
-fake_input(key::String; t=term) = Base.print(t.in_stream, key)

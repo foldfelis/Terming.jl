@@ -3,6 +3,7 @@ module Terming
     include("terminal.jl")
     include("event.jl")
     include("parser.jl")
+    include("dev_tools.jl")
 
     export term, in_stream, out_stream, err_stream
     export set_term!
