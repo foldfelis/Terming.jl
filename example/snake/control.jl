@@ -32,7 +32,8 @@ end
 event_queue(app::App) = app.listener.pipeline[end]
 
 function init_term(app::App)
-    T.cshow(false); T.alt_screen(true)
+    T.cshow(false)
+    Sys.iswindows() ? T.clear() : T.alt_screen(true)
     h, w = app.size; T.displaysize(h+3, w)
     T.raw!(true)
 end
@@ -40,7 +41,8 @@ end
 function reset_term(::App)
     T.raw!(false)
     sleep(1)
-    T.alt_screen(false); T.cshow()
+    !(Sys.iswindows()) && T.alt_screen(false)
+    T.cshow()
 
     return
 end
