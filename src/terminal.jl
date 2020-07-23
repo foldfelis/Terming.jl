@@ -152,7 +152,7 @@ join(args...) = Base.join(out_stream, args...)
 # | utils |
 # +-------+
 
-function init_term(; in_stream=stdin, out_stream=stdout, err_stream=stderr)
+function init_term(in_stream=stdin, out_stream=stdout, err_stream=stderr)
     return REPL.Terminals.TTYTerminal(
         get(ENV, "TERM", Sys.iswindows() ? "" : "dumb"),
         in_stream, out_stream, err_stream

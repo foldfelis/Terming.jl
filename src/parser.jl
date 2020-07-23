@@ -13,7 +13,7 @@ function parse_sequence(sequence::String)
     return PasteEvent(sequence) # fallback
 end
 
-function parse_single_char_sequence(sequence::Char; is_alt=false)
+function parse_single_char_sequence(sequence::Char, is_alt=false)
     if is_alt
         adjoint_key = ALT
         adjoint_ctrl = CTRL_ALT
@@ -48,7 +48,7 @@ function parse_esc_leaded_sequence(sequence::String, state::Int)
     elseif c == '[' # Some CSI sequence
         return parse_csi(sequence, state)
     elseif iterate(sequence, state) === nothing # ALT + key
-        return parse_single_char_sequence(c, is_alt=true)
+        return parse_single_char_sequence(c, true)
     end
 
     return PasteEvent(sequence) # fallback
@@ -89,7 +89,7 @@ function parse_csi(sequence::String, state::Int)
             adjoint = NO_ADJOINT
         end
 
-        return parse_vt_code(sequence, code, adjoint=adjoint)
+        return parse_vt_code(sequence, code, adjoint)
     else # xterm sequence
         code_sequence = sequence[state:end]
         if ';' in code_sequence # with adjoint keys
@@ -125,11 +125,11 @@ function parse_csi(sequence::String, state::Int)
             adjoint = NO_ADJOINT
         end
 
-        return parse_xterm_code(sequence, code, adjoint=adjoint)
+        return parse_xterm_code(sequence, code, adjoint)
     end
 end
 
-function parse_vt_code(sequence::String, code::Int; adjoint=NO_ADJOINT)
+function parse_vt_code(sequence::String, code::Int, adjoint=NO_ADJOINT)
     if code in 1:6 # HOME INSERT DELETE END PAGEUP PAGEDOWN
         enum_bias = 11
         return KeyPressedEvent(SpecialKey(code+enum_bias), adjoint)
@@ -148,7 +148,7 @@ function parse_vt_code(sequence::String, code::Int; adjoint=NO_ADJOINT)
     return PasteEvent(sequence) # fallback
 end
 
-function parse_xterm_code(sequence::String, code::Int; adjoint=NO_ADJOINT)
+function parse_xterm_code(sequence::String, code::Int, adjoint=NO_ADJOINT)
     if code in Int('A'):Int('D') || code == Int('Z') # UP DOWN RIGHT LEFT BACKTAB
         return KeyPressedEvent(SpecialKey(code), adjoint)
     elseif code == Int('F') # END
