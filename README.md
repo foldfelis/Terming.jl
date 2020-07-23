@@ -176,4 +176,10 @@ For a more complete example, take a look at [Snake Game](example/snake).
 
 ## State of supporting Windows
 
-Currently, Terming.jl is work in progress, and **partially** supports Windows.
+Windows default Powershell and command line emulators are two of the most popular terminal emulators among Windows users though, it is recommended to use [Windows' new terminal emulator](https://github.com/microsoft/terminal) so as to have more colorful and highly customizable experience.
+
+Currently, Terming.jl supports Windows, yet some features may behave abnormally such as:
+
+* Change terminal size: `displaysize(::Int, ::Int)`
+* Alternate screen mode: `alt_screen(::Bool)`
+* `BackTab` determination
