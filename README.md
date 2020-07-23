@@ -138,6 +138,34 @@ main()
 
 ![](example/features/buffered2.png)
 
+### **Alternate screen mode**
+
+```julia
+using Terming
+
+function main()
+    # set term size
+    Terming.displaysize(20, 75)
+    # switch to alternate screen
+    Terming.alt_screen(true)
+
+    Terming.cmove(1, 1)
+    Terming.println("Terminal is now switched to the alternate screen mode.")
+    Terming.println("Press ENTER to switch back."); readline()
+
+    # switch back from alternate screen
+    Terming.alt_screen(false)
+
+    return
+end
+
+main()
+```
+
+![](example/features/alt_screen1.png)
+
+![](example/features/alt_screen2.png)
+
 ### **Looking for color screen?**
 
 It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations. [Here](example/features/logo.jl) and [here](example/snake/view.jl) are some examples
