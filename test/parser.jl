@@ -81,20 +81,20 @@
 
             end
 
-            function create_ctls(ctls_code::Int)
-                if ctls_code == 2
+            function create_adjoint(adjoint_code::Int)
+                if adjoint_code == 2
                     return T.SHIFT
-                elseif ctls_code == 3
+                elseif adjoint_code == 3
                     return T.CTRL
-                elseif ctls_code == 4
+                elseif adjoint_code == 4
                     return T.SHIFT_ALT
-                elseif ctls_code == 5
+                elseif adjoint_code == 5
                     return T.ALT
-                elseif ctls_code == 6
+                elseif adjoint_code == 6
                     return T.SHIFT_CTRL
-                elseif ctls_code == 7
+                elseif adjoint_code == 7
                     return T.CTRL_ALT
-                elseif ctls_code == 8
+                elseif adjoint_code == 8
                     return T.SHIFT_CTRL_ALT
                 else
                     return -1
@@ -123,62 +123,62 @@
 
                 end
 
-                function test_vt(; ctls_code=-1, ctls=T.NO_CTL)
-                    if ctls_code != -1
-                        ctls_str = ";$(ctls_code)"
+                function test_vt(; adjoint_code=-1, adjoint=T.NO_ADJOINT)
+                    if adjoint_code != -1
+                        adjoint_str = ";$(adjoint_code)"
                     else
-                        ctls_str = ""
+                        adjoint_str = ""
                     end
 
-                    @test T.parse_sequence("\e[1$(ctls_str)~") === T.KeyPressedEvent(T.HOME, ctls)
-                    @test T.parse_sequence("\e[2$(ctls_str)~") === T.KeyPressedEvent(T.INSERT, ctls)
-                    @test T.parse_sequence("\e[3$(ctls_str)~") === T.KeyPressedEvent(T.DELETE, ctls)
-                    @test T.parse_sequence("\e[4$(ctls_str)~") === T.KeyPressedEvent(T.END, ctls)
-                    @test T.parse_sequence("\e[5$(ctls_str)~") === T.KeyPressedEvent(T.PAGEUP, ctls)
-                    @test T.parse_sequence("\e[6$(ctls_str)~") === T.KeyPressedEvent(T.PAGEDOWN, ctls)
-                    @test T.parse_sequence("\e[7$(ctls_str)~") === T.KeyPressedEvent(T.HOME, ctls)
-                    @test T.parse_sequence("\e[8$(ctls_str)~") === T.KeyPressedEvent(T.END, ctls)
-                    @test T.parse_sequence("\e[9$(ctls_str)~") === T.PasteEvent("\e[9$(ctls_str)~")
-                    @test T.parse_sequence("\e[10$(ctls_str)~") === T.PasteEvent("\e[10$(ctls_str)~") # F0
-                    @test T.parse_sequence("\e[11$(ctls_str)~") === T.KeyPressedEvent(T.F1, ctls)
-                    @test T.parse_sequence("\e[12$(ctls_str)~") === T.KeyPressedEvent(T.F2, ctls)
-                    @test T.parse_sequence("\e[13$(ctls_str)~") === T.KeyPressedEvent(T.F3, ctls)
-                    @test T.parse_sequence("\e[14$(ctls_str)~") === T.KeyPressedEvent(T.F4, ctls)
-                    @test T.parse_sequence("\e[15$(ctls_str)~") === T.KeyPressedEvent(T.F5, ctls)
-                    @test T.parse_sequence("\e[16$(ctls_str)~") === T.PasteEvent("\e[16$(ctls_str)~")
-                    @test T.parse_sequence("\e[17$(ctls_str)~") === T.KeyPressedEvent(T.F6, ctls)
-                    @test T.parse_sequence("\e[18$(ctls_str)~") === T.KeyPressedEvent(T.F7, ctls)
-                    @test T.parse_sequence("\e[19$(ctls_str)~") === T.KeyPressedEvent(T.F8, ctls)
-                    @test T.parse_sequence("\e[20$(ctls_str)~") === T.KeyPressedEvent(T.F9, ctls)
-                    @test T.parse_sequence("\e[21$(ctls_str)~") === T.KeyPressedEvent(T.F10, ctls)
-                    @test T.parse_sequence("\e[22$(ctls_str)~") === T.PasteEvent("\e[22$(ctls_str)~")
-                    @test T.parse_sequence("\e[23$(ctls_str)~") === T.KeyPressedEvent(T.F11, ctls)
-                    @test T.parse_sequence("\e[24$(ctls_str)~") === T.KeyPressedEvent(T.F12, ctls)
-                    @test T.parse_sequence("\e[25$(ctls_str)~") === T.PasteEvent("\e[25$(ctls_str)~") # F13
-                    @test T.parse_sequence("\e[26$(ctls_str)~") === T.PasteEvent("\e[26$(ctls_str)~") # F14
-                    @test T.parse_sequence("\e[27$(ctls_str)~") === T.PasteEvent("\e[27$(ctls_str)~")
-                    @test T.parse_sequence("\e[28$(ctls_str)~") === T.PasteEvent("\e[28$(ctls_str)~") # F15
-                    @test T.parse_sequence("\e[29$(ctls_str)~") === T.PasteEvent("\e[29$(ctls_str)~") # F16
-                    @test T.parse_sequence("\e[30$(ctls_str)~") === T.PasteEvent("\e[30$(ctls_str)~")
-                    @test T.parse_sequence("\e[31$(ctls_str)~") === T.PasteEvent("\e[31$(ctls_str)~") # F17
-                    @test T.parse_sequence("\e[32$(ctls_str)~") === T.PasteEvent("\e[32$(ctls_str)~") # F18
-                    @test T.parse_sequence("\e[33$(ctls_str)~") === T.PasteEvent("\e[33$(ctls_str)~") # F19
-                    @test T.parse_sequence("\e[34$(ctls_str)~") === T.PasteEvent("\e[34$(ctls_str)~") # F20
-                    @test T.parse_sequence("\e[35$(ctls_str)~") === T.PasteEvent("\e[35$(ctls_str)~")
+                    @test T.parse_sequence("\e[1$(adjoint_str)~") === T.KeyPressedEvent(T.HOME, adjoint)
+                    @test T.parse_sequence("\e[2$(adjoint_str)~") === T.KeyPressedEvent(T.INSERT, adjoint)
+                    @test T.parse_sequence("\e[3$(adjoint_str)~") === T.KeyPressedEvent(T.DELETE, adjoint)
+                    @test T.parse_sequence("\e[4$(adjoint_str)~") === T.KeyPressedEvent(T.END, adjoint)
+                    @test T.parse_sequence("\e[5$(adjoint_str)~") === T.KeyPressedEvent(T.PAGEUP, adjoint)
+                    @test T.parse_sequence("\e[6$(adjoint_str)~") === T.KeyPressedEvent(T.PAGEDOWN, adjoint)
+                    @test T.parse_sequence("\e[7$(adjoint_str)~") === T.KeyPressedEvent(T.HOME, adjoint)
+                    @test T.parse_sequence("\e[8$(adjoint_str)~") === T.KeyPressedEvent(T.END, adjoint)
+                    @test T.parse_sequence("\e[9$(adjoint_str)~") === T.PasteEvent("\e[9$(adjoint_str)~")
+                    @test T.parse_sequence("\e[10$(adjoint_str)~") === T.PasteEvent("\e[10$(adjoint_str)~") # F0
+                    @test T.parse_sequence("\e[11$(adjoint_str)~") === T.KeyPressedEvent(T.F1, adjoint)
+                    @test T.parse_sequence("\e[12$(adjoint_str)~") === T.KeyPressedEvent(T.F2, adjoint)
+                    @test T.parse_sequence("\e[13$(adjoint_str)~") === T.KeyPressedEvent(T.F3, adjoint)
+                    @test T.parse_sequence("\e[14$(adjoint_str)~") === T.KeyPressedEvent(T.F4, adjoint)
+                    @test T.parse_sequence("\e[15$(adjoint_str)~") === T.KeyPressedEvent(T.F5, adjoint)
+                    @test T.parse_sequence("\e[16$(adjoint_str)~") === T.PasteEvent("\e[16$(adjoint_str)~")
+                    @test T.parse_sequence("\e[17$(adjoint_str)~") === T.KeyPressedEvent(T.F6, adjoint)
+                    @test T.parse_sequence("\e[18$(adjoint_str)~") === T.KeyPressedEvent(T.F7, adjoint)
+                    @test T.parse_sequence("\e[19$(adjoint_str)~") === T.KeyPressedEvent(T.F8, adjoint)
+                    @test T.parse_sequence("\e[20$(adjoint_str)~") === T.KeyPressedEvent(T.F9, adjoint)
+                    @test T.parse_sequence("\e[21$(adjoint_str)~") === T.KeyPressedEvent(T.F10, adjoint)
+                    @test T.parse_sequence("\e[22$(adjoint_str)~") === T.PasteEvent("\e[22$(adjoint_str)~")
+                    @test T.parse_sequence("\e[23$(adjoint_str)~") === T.KeyPressedEvent(T.F11, adjoint)
+                    @test T.parse_sequence("\e[24$(adjoint_str)~") === T.KeyPressedEvent(T.F12, adjoint)
+                    @test T.parse_sequence("\e[25$(adjoint_str)~") === T.PasteEvent("\e[25$(adjoint_str)~") # F13
+                    @test T.parse_sequence("\e[26$(adjoint_str)~") === T.PasteEvent("\e[26$(adjoint_str)~") # F14
+                    @test T.parse_sequence("\e[27$(adjoint_str)~") === T.PasteEvent("\e[27$(adjoint_str)~")
+                    @test T.parse_sequence("\e[28$(adjoint_str)~") === T.PasteEvent("\e[28$(adjoint_str)~") # F15
+                    @test T.parse_sequence("\e[29$(adjoint_str)~") === T.PasteEvent("\e[29$(adjoint_str)~") # F16
+                    @test T.parse_sequence("\e[30$(adjoint_str)~") === T.PasteEvent("\e[30$(adjoint_str)~")
+                    @test T.parse_sequence("\e[31$(adjoint_str)~") === T.PasteEvent("\e[31$(adjoint_str)~") # F17
+                    @test T.parse_sequence("\e[32$(adjoint_str)~") === T.PasteEvent("\e[32$(adjoint_str)~") # F18
+                    @test T.parse_sequence("\e[33$(adjoint_str)~") === T.PasteEvent("\e[33$(adjoint_str)~") # F19
+                    @test T.parse_sequence("\e[34$(adjoint_str)~") === T.PasteEvent("\e[34$(adjoint_str)~") # F20
+                    @test T.parse_sequence("\e[35$(adjoint_str)~") === T.PasteEvent("\e[35$(adjoint_str)~")
                 end
 
-                @testset "with AdjointKeys" begin
+                @testset "with AdjointKey" begin
 
                     # +------------------------------------------------------------------+
-                    # | the form of the sequence: "\e[<code>;<ctls_code>~" and code=1:35 |
+                    # | the form of the sequence: "\e[<code>;<adjoint_code>~" and code=1:35 |
                     # +------------------------------------------------------------------+
                     for i in 2:8
-                        test_vt(ctls_code=i, ctls=create_ctls(i))
+                        test_vt(adjoint_code=i, adjoint=create_adjoint(i))
                     end
 
                 end
 
-                @testset "without AdjointKeys" begin
+                @testset "without AdjointKey" begin
 
                     # +------------------------------------------------------+
                     # | the form of the sequence: "\e[<code>~" and code=1:35 |
@@ -213,55 +213,55 @@
 
                 end
 
-                function test_xterm(; ctls_code=-1, ctls=T.NO_CTL)
-                    if ctls_code != -1
-                        ctls_str = "1;$(ctls_code)"
+                function test_xterm(; adjoint_code=-1, adjoint=T.NO_ADJOINT)
+                    if adjoint_code != -1
+                        adjoint_str = "1;$(adjoint_code)"
                     else
-                        ctls_str = ""
+                        adjoint_str = ""
                     end
 
-                    @test T.parse_sequence("\e[$(ctls_str)A") === T.KeyPressedEvent(T.UP, ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)B") === T.KeyPressedEvent(T.DOWN, ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)C") === T.KeyPressedEvent(T.RIGHT, ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)D") === T.KeyPressedEvent(T.LEFT, ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)E") === T.PasteEvent("\e[$(ctls_str)E")
-                    @test T.parse_sequence("\e[$(ctls_str)F") === T.KeyPressedEvent(T.END, ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)G") === T.KeyPressedEvent('5', ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)H") === T.KeyPressedEvent(T.HOME, ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)I") === T.PasteEvent("\e[$(ctls_str)I")
-                    @test T.parse_sequence("\e[$(ctls_str)J") === T.PasteEvent("\e[$(ctls_str)J")
-                    @test T.parse_sequence("\e[$(ctls_str)K") === T.PasteEvent("\e[$(ctls_str)K")
-                    @test T.parse_sequence("\e[$(ctls_str)L") === T.PasteEvent("\e[$(ctls_str)L")
-                    @test T.parse_sequence("\e[$(ctls_str)M") === T.PasteEvent("\e[$(ctls_str)M")
-                    @test T.parse_sequence("\e[$(ctls_str)N") === T.PasteEvent("\e[$(ctls_str)N")
-                    @test T.parse_sequence("\e[$(ctls_str)O") === T.PasteEvent("\e[$(ctls_str)O")
-                    if ctls_code != -1
-                    @test T.parse_sequence("\e[$(ctls_str)P") === T.KeyPressedEvent(T.F1, ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)Q") === T.KeyPressedEvent(T.F2, ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)R") === T.KeyPressedEvent(T.F3, ctls)
-                    @test T.parse_sequence("\e[$(ctls_str)S") === T.KeyPressedEvent(T.F4, ctls)
+                    @test T.parse_sequence("\e[$(adjoint_str)A") === T.KeyPressedEvent(T.UP, adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)B") === T.KeyPressedEvent(T.DOWN, adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)C") === T.KeyPressedEvent(T.RIGHT, adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)D") === T.KeyPressedEvent(T.LEFT, adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)E") === T.PasteEvent("\e[$(adjoint_str)E")
+                    @test T.parse_sequence("\e[$(adjoint_str)F") === T.KeyPressedEvent(T.END, adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)G") === T.KeyPressedEvent('5', adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)H") === T.KeyPressedEvent(T.HOME, adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)I") === T.PasteEvent("\e[$(adjoint_str)I")
+                    @test T.parse_sequence("\e[$(adjoint_str)J") === T.PasteEvent("\e[$(adjoint_str)J")
+                    @test T.parse_sequence("\e[$(adjoint_str)K") === T.PasteEvent("\e[$(adjoint_str)K")
+                    @test T.parse_sequence("\e[$(adjoint_str)L") === T.PasteEvent("\e[$(adjoint_str)L")
+                    @test T.parse_sequence("\e[$(adjoint_str)M") === T.PasteEvent("\e[$(adjoint_str)M")
+                    @test T.parse_sequence("\e[$(adjoint_str)N") === T.PasteEvent("\e[$(adjoint_str)N")
+                    @test T.parse_sequence("\e[$(adjoint_str)O") === T.PasteEvent("\e[$(adjoint_str)O")
+                    if adjoint_code != -1
+                    @test T.parse_sequence("\e[$(adjoint_str)P") === T.KeyPressedEvent(T.F1, adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)Q") === T.KeyPressedEvent(T.F2, adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)R") === T.KeyPressedEvent(T.F3, adjoint)
+                    @test T.parse_sequence("\e[$(adjoint_str)S") === T.KeyPressedEvent(T.F4, adjoint)
                     end
-                    @test T.parse_sequence("\e[$(ctls_str)T") === T.PasteEvent("\e[$(ctls_str)T")
-                    @test T.parse_sequence("\e[$(ctls_str)U") === T.PasteEvent("\e[$(ctls_str)U")
-                    @test T.parse_sequence("\e[$(ctls_str)V") === T.PasteEvent("\e[$(ctls_str)V")
-                    @test T.parse_sequence("\e[$(ctls_str)W") === T.PasteEvent("\e[$(ctls_str)W")
-                    @test T.parse_sequence("\e[$(ctls_str)X") === T.PasteEvent("\e[$(ctls_str)X")
-                    @test T.parse_sequence("\e[$(ctls_str)Y") === T.PasteEvent("\e[$(ctls_str)Y")
-                    @test T.parse_sequence("\e[$(ctls_str)Z") === T.KeyPressedEvent(T.BACKTAB, ctls)
+                    @test T.parse_sequence("\e[$(adjoint_str)T") === T.PasteEvent("\e[$(adjoint_str)T")
+                    @test T.parse_sequence("\e[$(adjoint_str)U") === T.PasteEvent("\e[$(adjoint_str)U")
+                    @test T.parse_sequence("\e[$(adjoint_str)V") === T.PasteEvent("\e[$(adjoint_str)V")
+                    @test T.parse_sequence("\e[$(adjoint_str)W") === T.PasteEvent("\e[$(adjoint_str)W")
+                    @test T.parse_sequence("\e[$(adjoint_str)X") === T.PasteEvent("\e[$(adjoint_str)X")
+                    @test T.parse_sequence("\e[$(adjoint_str)Y") === T.PasteEvent("\e[$(adjoint_str)Y")
+                    @test T.parse_sequence("\e[$(adjoint_str)Z") === T.KeyPressedEvent(T.BACKTAB, adjoint)
                 end
 
-                @testset "with AdjointKeys" begin
+                @testset "with AdjointKey" begin
 
                     # +-----------------------------------------------------------------+
-                    # | the form of the sequence: "\e[1;<ctls_code><code>" and code=A:Z |
+                    # | the form of the sequence: "\e[1;<adjoint_code><code>" and code=A:Z |
                     # +-----------------------------------------------------------------+
                     for i in 2:8
-                        test_xterm(ctls_code=i, ctls=create_ctls(i))
+                        test_xterm(adjoint_code=i, adjoint=create_adjoint(i))
                     end
 
                 end
 
-                @testset "without AdjointKeys" begin
+                @testset "without AdjointKey" begin
 
                     # +----------------------------------------------------+
                     # | the form of the sequence: "\e[<code>" and code=A:Z |

@@ -1,8 +1,8 @@
-export SpecialKeys, AdjointKeys
+export SpecialKey, AdjointKey
 export Event, KeyPressedEvent, PasteEvent
 export match
 
-@enum SpecialKeys begin
+@enum SpecialKey begin
     # Function Keys match range 0:11
     F1
     F2
@@ -39,7 +39,7 @@ export match
     NULL
 end
 
-@enum AdjointKeys begin
+@enum AdjointKey begin
     SHIFT = 2
     CTRL = 3
     SHIFT_ALT = 4
@@ -47,21 +47,23 @@ end
     SHIFT_CTRL = 6
     CTRL_ALT = 7
     SHIFT_CTRL_ALT = 8
-    NO_CTL = -1
+    NO_ADJOINT = -1
 end
 
 abstract type Event end
 
+KeyboardKey = Union{Char, SpecialKey}
+
 struct KeyPressedEvent <: Event
-    key::Union{Char, SpecialKeys}
-    adjoint_keys::AdjointKeys
+    key::KeyboardKey
+    adjoint_key::AdjointKey
 end
 
-KeyPressedEvent(key::Union{Char, SpecialKeys}) = KeyPressedEvent(key, NO_CTL)
+KeyPressedEvent(key::KeyboardKey) = KeyPressedEvent(key, NO_ADJOINT)
 
 function Base.show(io::IO, e::KeyPressedEvent)
-    adjoint_keys = (e.adjoint_keys === NO_CTL) ? "" : "$(string.(e.adjoint_keys))+"
-    Base.print(io, "KeyPressedEvent($(adjoint_keys)'$(string(e.key))')")
+    adjoint_key = (e.adjoint_key === NO_ADJOINT) ? "" : "$(string.(e.adjoint_key))+"
+    Base.print(io, "KeyPressedEvent($(adjoint_key)'$(string(e.key))')")
 end
 
 struct PasteEvent <: Event
