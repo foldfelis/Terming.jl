@@ -175,34 +175,6 @@ end
 
 end
 
-@testset "io test conflict with Base" begin
-
-    fake_out_stream = Base.BufferStream()
-
-    write(fake_out_stream, "a")
-    @test T.read_stream(fake_out_stream) == "a"
-
-    write(fake_out_stream, "a", "a")
-    @test T.read_stream(fake_out_stream) == "aa"
-
-    print(fake_out_stream, "a")
-    @test T.read_stream(fake_out_stream) == "a"
-
-    print(fake_out_stream, "a", "a")
-    @test T.read_stream(fake_out_stream) == "aa"
-
-    println(fake_out_stream, "a")
-    @test T.read_stream(fake_out_stream) == "a\n"
-
-    println(fake_out_stream, "a", "a")
-    @test T.read_stream(fake_out_stream) == "aa\n"
-
-    list = ["a", "b", "c", "d"]
-    join(fake_out_stream, list, ", ", " and ")
-    @test T.read_stream(fake_out_stream) == "a, b, c and d"
-
-end
-
 @testset "terminal.utils" begin
 
     T.raw!(true)

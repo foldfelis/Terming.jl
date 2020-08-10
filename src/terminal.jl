@@ -29,12 +29,6 @@ export
     crestore,
     alt_screen,
 
-    # io functions conflict with Base
-    # write,
-    # print,
-    # println,
-    # join,
-
     # utils
     read_next_char,
     init_term,
