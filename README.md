@@ -5,11 +5,9 @@
 
 | **Build Status**                                              |
 |:-------------------------------------------------------------:|
-| [![][travis-img]][travis-url] [![][codecov-img]][codecov-url] |
+| ![CI][github-ci] [![][codecov-img]][codecov-url] |
 
-[travis-img]: https://travis-ci.com/foldfelis/Terming.jl.svg?branch=master
-
-[travis-url]: https://travis-ci.com/github/foldfelis/Terming.jl
+[github-ci]: https://github.com/foldfelis/Terming.jl/workflows/CI/badge.svg
 
 [codecov-img]: https://codecov.io/gh/foldfelis/Terming.jl/branch/master/graph/badge.svg
 
