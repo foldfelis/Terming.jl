@@ -3,8 +3,8 @@
     <br>
 </h1>
 
-| **Build Status**                                              |
-|:-------------------------------------------------------------:|
+| **Build Status**                                 |
+|:------------------------------------------------:|
 | ![CI][github-ci] [![][codecov-img]][codecov-url] |
 
 [github-ci]: https://github.com/foldfelis/Terming.jl/workflows/CI/badge.svg
