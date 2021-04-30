@@ -214,7 +214,7 @@ main()
 
 It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations.
 
-You will find it entertained to take a look at how I design the logo [here](example/logo.jl). And as well as how I render a snake game [here](https://github.com/foldfelis/Snake.jl/blob/master/src/view.jl).
+You will find it entertaining to take a look at how I design the logo [here](example/logo.jl). And as well as how I render a snake game [here](https://github.com/foldfelis/Snake.jl/blob/master/src/view.jl).
 
 ## Want something more advanced?
 
