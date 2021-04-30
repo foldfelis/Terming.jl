@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img width="650" src="example/features/logo.png" alt="Terming">
+    <img width="650" src="example/logo.png" alt="Terming">
     <br>
 </h1>
 
@@ -34,6 +34,8 @@ pkg> add Terming
 
 ### **Cursor movement and Console size**
 
+<details>
+
 ```julia
 using Terming
 
@@ -62,9 +64,13 @@ end
 main()
 ```
 
-![](example/features/cursor.png)
+![](example/cursor.png)
+
+</details>
 
 ### **Raw mode and Special keys events**
+
+<details>
 
 ```julia
 using Terming
@@ -92,33 +98,63 @@ end
 main()
 ```
 
-![](example/features/event.png)
+![](example/event.png)
+
+</details>
 
 ### **Buffered**
+
+<details>
 
 ```julia
 using Terming
 
+function println_animation(str::String; delay::Real=0.05)
+    # save current position of cursor
+    Terming.csave()
+
+    for c in str
+        Terming.print(c)
+        sleep(delay)
+        delay *= 0.98
+    end
+
+    # restore position of cursor and move down
+    Terming.crestore(); Terming.cmove_down()
+end
+
 function main()
     # set term size and clear
-    Terming.displaysize(20, 75); Terming.clear()
+    Terming.displaysize(20, 80); Terming.clear()
     # move cursor to (row=2, col=2)
     Terming.cmove(2, 2)
 
     # +----------------+
     # | without buffer |
     # +----------------+
+    discription = "The following string is blocked bue to the time-consuming calculations:"
+    println_animation(discription)
+
+    # save current position of cursor
+    Terming.csave()
+
     str = "This string will be finished printing once the calculations are..."
     Terming.print(str)
     sleep(1) # fake time consuming calculation
     Terming.println(" done!!")
 
-    # move cursor to the beginning of next two line; move to col=2
-    Terming.cmove_line_down(2); Terming.cmove_col(2)
+    # restore position of cursor and move down 2 row
+    Terming.crestore(); Terming.cmove_down(2)
 
     # +-------------+
     # | with buffer |
     # +-------------+
+    discription = "The following string is not blocked by the time-consuming calculations:"
+    println_animation(discription)
+
+    # save current position of cursor
+    Terming.csave()
+
     Terming.buffered() do buffer
         str = "This string will be finished printing once the calculations are"
         Terming.print(buffer, str)
@@ -126,17 +162,24 @@ function main()
         Terming.println(buffer, " done!!")
     end
 
+    # restore position of cursor and move down 2 row
+    Terming.crestore(); Terming.cmove_down(2)
+
     return
 end
 
 main()
 ```
 
-![](example/features/buffered1.png)
+![](example/buffered1.png)
 
-![](example/features/buffered2.png)
+![](example/buffered2.png)
+
+</details>
 
 ### **Alternate screen mode**
+
+<details>
 
 ```julia
 using Terming
@@ -160,17 +203,22 @@ end
 main()
 ```
 
-![](example/features/alt_screen1.png)
+![](example/alt_screen1.png)
 
-![](example/features/alt_screen2.png)
+![](example/alt_screen2.png)
+
+</details>
+
 
 ### **Looking for color screen?**
 
-It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations. [Here](example/features/logo.jl) and [here](example/snake/view.jl) are some examples
+It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations.
+
+You will find it entertained to take a look at how I design the logo [here](example/logo.jl). And as well as how I render a snake game [here](https://github.com/foldfelis/Snake.jl/blob/master/src/view.jl).
 
 ## Want something more advanced?
 
-For a more complete example, take a look at [Snake Game](example/snake).
+For a more complete example, take a look at [Snake Game](https://github.com/foldfelis/Snake.jl).
 
 ## State of supporting Windows
 
