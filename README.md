@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img width="650" src="example/features/logo.png" alt="Terming">
+    <img width="650" src="example/logo.png" alt="Terming">
     <br>
 </h1>
 
@@ -34,6 +34,8 @@ pkg> add Terming
 
 ### **Cursor movement and Console size**
 
+<details>
+
 ```julia
 using Terming
 
@@ -62,9 +64,13 @@ end
 main()
 ```
 
-![](example/features/cursor.png)
+![](example/cursor.png)
+
+</details>
 
 ### **Raw mode and Special keys events**
+
+<details>
 
 ```julia
 using Terming
@@ -92,9 +98,13 @@ end
 main()
 ```
 
-![](example/features/event.png)
+![](example/event.png)
+
+</details>
 
 ### **Buffered**
+
+<details>
 
 ```julia
 using Terming
@@ -132,11 +142,15 @@ end
 main()
 ```
 
-![](example/features/buffered1.png)
+![](example/buffered1.png)
 
-![](example/features/buffered2.png)
+![](example/buffered2.png)
+
+</details>
 
 ### **Alternate screen mode**
+
+<details>
 
 ```julia
 using Terming
@@ -160,17 +174,20 @@ end
 main()
 ```
 
-![](example/features/alt_screen1.png)
+![](example/alt_screen1.png)
 
-![](example/features/alt_screen2.png)
+![](example/alt_screen2.png)
+
+</details>
+
 
 ### **Looking for color screen?**
 
-It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations. [Here](example/features/logo.jl) and [here](example/snake/view.jl) are some examples
+It is recommended to use [Crayons](https://github.com/KristofferC/Crayons.jl) to gain more decorations. [Here](example/logo.jl) and [here](example/snake/view.jl) are some examples
 
 ## Want something more advanced?
 
-For a more complete example, take a look at [Snake Game](example/snake).
+For a more complete example, take a look at [Snake Game](https://github.com/foldfelis/Snake.jl).
 
 ## State of supporting Windows
 
